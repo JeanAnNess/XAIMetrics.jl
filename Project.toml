@@ -1,0 +1,7 @@
+name = "ExplanationMetrics"
+uuid = "e7195dda-7263-482e-a02a-16fc3aed5685"
+authors = ["Janes Sanne <janes.luc.sanne@campus.tu-berlin.de>"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.11"
