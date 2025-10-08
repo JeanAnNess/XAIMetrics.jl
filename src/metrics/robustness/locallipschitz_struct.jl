@@ -26,4 +26,5 @@ TODO: add more perturb functions, add normalization functions
     perturb_std::Float64 = 0.1
     return_nan_when_prediction_changes::Bool = false
     normalise::Bool = true
+    normalise_func::Function = normalize_by_max_abs
 end

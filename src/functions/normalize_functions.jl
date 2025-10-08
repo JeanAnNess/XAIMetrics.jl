@@ -17,7 +17,7 @@ function normalize_by_max_abs(
         normalise_axes = collect(1:N)
     end
 
-    max_abs = maximum(abs, a; dims=normalise_axes, keepdims=true)
+    max_abs = maximum(abs, a; dims=normalise_axes)
     
     return a ./ max_abs
 end

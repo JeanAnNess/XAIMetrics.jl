@@ -25,17 +25,7 @@ function _evaluate(
     batch_size = size(x_batch)[end]
     num_features = div(length(x_batch), batch_size)
 
-    a_batch_processed = similar(a_batch)
-    # TODO: Auslagern von normalise
-    if metric.normalise
-        for i in axes(a_batch, 4)
-            sample = @view a_batch[:,:,:,i]
-            max_abs = maximum(abs, sample)
-            a_batch_processed[:,:,:,i] = sample ./ (max_abs + 1e-10)
-        end
-    else
-        a_batch_processed = a_batch
-    end
+    a_batch_processed = metric.normalise ? metric.normalise_func(a_batch) : a_batch
 
     # flatten to (batch_size, features), (B, W*H*C)
     X_orig_flat = reshape(x_batch, num_features, batch_size)'
@@ -71,18 +61,7 @@ function _evaluate(
         # Assumes explain_func returns a similar structure/array
         a_perturbed = explain_func(model, x_perturbed, y_batch)
 
-        a_perturbed_processed = similar(a_perturbed)
-
-        # TODO: Auslagern von normalise
-        if metric.normalise
-            for j in axes(a_perturbed, 4)
-                sample = @view a_perturbed[:,:,:,j]
-                max_abs = maximum(abs, sample)
-                a_perturbed_processed[:,:,:,j] = sample ./ (max_abs + 1e-10)
-            end
-        else
-            a_perturbed_processed = a_perturbed
-        end
+        a_perturbed_processed = metric.normalise ? metric.normalise_func(a_perturbed) : a_perturbed
 
         A_perturbed_flat = reshape(a_perturbed_processed, num_features, batch_size)'
 
