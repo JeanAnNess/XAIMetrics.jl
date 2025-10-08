@@ -2,5 +2,5 @@ using ExplanationMetrics
 using Test
 
 @testset "ExplanationMetrics.jl" begin
-    # Write your tests here.
+    include("test_lle.jl")
 end
