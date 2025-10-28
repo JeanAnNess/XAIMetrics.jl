@@ -1,5 +1,6 @@
 [deps]
 ExplainableAI = "4f1bc3e1-d60d-4ed0-9367-9bdff9846d3b"
+XAIMetrics = "e7195dda-7263-482e-a02a-16fc3aed5685"
 Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Metalhead = "dbeba491-748d-5e0e-a39e-b530a07fa0cc"

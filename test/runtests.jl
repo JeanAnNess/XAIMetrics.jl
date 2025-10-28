@@ -1,7 +1,7 @@
 using Test
-using ExplanationMetrics
+using XAIMetrics
 
-@testset "ExplanationMetrics.jl" begin
+@testset "XAIMetrics.jl" begin
     include("test_lle.jl")
     include("test_normalize.jl")
 end

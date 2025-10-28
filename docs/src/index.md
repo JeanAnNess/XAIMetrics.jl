@@ -1,14 +1,14 @@
 ```@meta
-CurrentModule = ExplanationMetrics
+CurrentModule = XAIMetrics
 ```
 
-# ExplanationMetrics
+# XAIMetrics
 
-Documentation for [ExplanationMetrics](https://github.com/JeanAnNess/ExplanationMetrics.jl).
+Documentation for [XAIMetrics](https://github.com/JeanAnNess/XAIMetrics.jl).
 
 ```@index
 ```
 
 ```@autodocs
-Modules = [ExplanationMetrics]
+Modules = [XAIMetrics]
 ```

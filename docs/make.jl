@@ -1,14 +1,14 @@
-using ExplanationMetrics
+using XAIMetrics
 using Documenter
 
-DocMeta.setdocmeta!(ExplanationMetrics, :DocTestSetup, :(using ExplanationMetrics); recursive=true)
+DocMeta.setdocmeta!(XAIMetrics, :DocTestSetup, :(using XAIMetrics); recursive=true)
 
 makedocs(;
-    modules=[ExplanationMetrics],
+    modules=[XAIMetrics],
     authors="Janes Sanne <janes.luc.sanne@campus.tu-berlin.de>",
-    sitename="ExplanationMetrics.jl",
+    sitename="XAIMetrics.jl",
     format=Documenter.HTML(;
-        canonical="https://JeanAnNess.github.io/ExplanationMetrics.jl",
+        canonical="https://JeanAnNess.github.io/XAIMetrics.jl",
         edit_link="master",
         assets=String[],
     ),
@@ -18,6 +18,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/JeanAnNess/ExplanationMetrics.jl",
+    repo="github.com/JeanAnNess/XAIMetrics.jl",
     devbranch="master",
 )

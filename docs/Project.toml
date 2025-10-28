@@ -1,3 +1,3 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-ExplanationMetrics = "e7195dda-7263-482e-a02a-16fc3aed5685"
+XAIMetrics = "e7195dda-7263-482e-a02a-16fc3aed5685"

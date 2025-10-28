@@ -71,6 +71,6 @@ jobs:
         shell: julia --project=docs --color=yes {0}
         run: |
           using Documenter: DocMeta, doctest
-          using ExplanationMetrics
-          DocMeta.setdocmeta!(ExplanationMetrics, :DocTestSetup, :(using ExplanationMetrics); recursive=true)
-          doctest(ExplanationMetrics)
+          using XAIMetrics
+          DocMeta.setdocmeta!(XAIMetrics, :DocTestSetup, :(using XAIMetrics); recursive=true)
+          doctest(XAIMetrics)
