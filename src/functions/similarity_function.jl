@@ -12,32 +12,33 @@ end
 """
     lipschitz_constant(a, b, c, d; norm_numerator, norm_denominator)
 
-Calculate the batched Lipschitz constant.
-This function expects flattened matrices where each row corresponds to a sample.
+Compute the batched local Lipschitz constant for a set of explanations and inputs.
+
 """
 function lipschitz_constant(
     a::AbstractMatrix,
     b::AbstractMatrix,
     c::AbstractMatrix,
     d::AbstractMatrix;
-    kwargs...
+    norm_numerator = distance_euclidean,
+    norm_denominator = distance_euclidean
 )
     eps = 1e-10
-
     default_dist = (x, y) -> norm(x - y)
-    d1 = get(kwargs, :norm_numerator, default_dist)
-    d2 = get(kwargs, :norm_denominator, default_dist)
+    d1 = norm_numerator
+    d2 = norm_denominator
 
-    num_samples = size(a, 1)
+    num_samples = size(a, 2) 
     scores = zeros(eltype(a), num_samples)
-    for i in axes(a, 1)
-        a_row = @view a[i, :]
-        b_row = @view b[i, :]
-        c_row = @view c[i, :]
-        d_row = @view d[i, :]
 
-        numerator = d1(a_row, b_row)
-        denominator = d2(c_row, d_row)
+    for i in 1:num_samples
+        a_col = @view a[:, i]
+        b_col = @view b[:, i]
+        c_col = @view c[:, i]
+        d_col = @view d[:, i]
+
+        numerator = d1(a_col, b_col)
+        denominator = d2(c_col, d_col)
         scores[i] = numerator / (denominator + eps)
     end
 

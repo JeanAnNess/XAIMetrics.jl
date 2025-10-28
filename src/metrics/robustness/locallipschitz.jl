@@ -1,0 +1,124 @@
+"""
+    LocalLipschitzEstimate(; nr_samples=200, similarity_func, norm_numerator, norm_denominator, perturb_std=0.1, return_nan_when_prediction_changes=false)
+    <: AbstractRobustnessMetric
+
+Robustness metric that tests the consistency in the explanation for neighboring examples
+by estimating the local Lipschitz constant.
+
+## Keyword arguments
+- `nr_samples::Int`: The number of Monte Carlo samples iterated
+- `similarity_func::Function`: Function to compute the Lipschitz ratio.
+- `norm_numerator::Function`: Function for norm calculations on the numerator (distance between explanations).
+- `norm_denominator::Function`: Function for norm calculations on the denominator (distance between inputs).
+- `perturb_std::Float64`: The standard deviation of the Gaussian noise added for perturbation (default: 0.1).
+- `return_nan_when_prediction_changes::Bool`: If true, samples where the model's prediction changes after perturbation are ignored (result is NaN for that sample).
+
+TODO: add more perturb functions, add normalization functions
+"""
+@kwdef struct LocalLipschitzEstimate{FS, FN, FD} <: AbstractRobustnessMetric
+    nr_samples::Int = 200
+    similarity_func::FS = lipschitz_constant
+    norm_numerator::FN = DEFAULT_NORM_FUNC
+    norm_denominator::FD = DEFAULT_NORM_FUNC
+    perturb_config::PerturbationConfig = PerturbationConfig()
+    return_nan_when_prediction_changes::Bool = false
+    normalize_config::NormalizationConfig = NormalizationConfig()
+end
+
+scoredirection(::LocalLipschitzEstimate) = lowerisbetter
+
+"""
+    evaluate(...)
+
+Internal function to compute the Local Lipschitz Estimate for a batch of data.
+"""
+function evaluate(
+    metric::LocalLipschitzEstimate,
+    method::AbstractXAIMethod,
+    x::AbstractArray{T, N}, 
+    y::AbstractVector{<:Integer}, # true labels
+    y_out::AbstractMatrix{<:Real}, # predicted logits
+    a::AbstractArray{T, N};
+    s::Union{Nothing, AbstractArray{Bool, N}} = nothing
+) where {T, N}
+
+    return local_lipschitz_estimate(
+        metric,
+        method,
+        x,
+        y,
+        y_out,
+        a
+    )
+end
+
+function local_lipschitz_estimate(
+    metric::LocalLipschitzEstimate,
+    method::AbstractXAIMethod,
+    x::AbstractArray{T, N}, 
+    y::AbstractVector{<:Integer},
+    y_out::AbstractMatrix{<:Real},
+    a::AbstractArray{T, N};
+) where {T, N}
+    # model = method.model
+    _size = size(x)
+    batch_size = _size[end]
+    num_features = prod(_size[1:end-1])
+
+    # Compute initial explanations
+    a_processed = normalize_explanations(a, metric.normalize_config)
+
+    # Flatten for similarity computation (features × batch)
+    X_orig_flat = reshape(x, num_features, batch_size)
+    A_orig_flat = reshape(a_processed, num_features, batch_size)
+
+    similarities = Matrix{T}(undef, batch_size, metric.nr_samples)
+
+    # Original predictions
+    if metric.return_nan_when_prediction_changes
+        y_pred_orig_idx = [argmax(col) for col in eachcol(y_out)]
+    end
+
+    x_perturbed = similar(x)
+
+    for i in 1:metric.nr_samples
+        # Perturb input using perturb_input! and metric.perturb_config
+        perturb_input!(x_perturbed, x, metric.perturb_config)
+
+        # Explanations for perturbed batch
+        expl_perturbed = analyze(x_perturbed, method)
+        a_perturbed = expl_perturbed.val
+        a_perturbed_processed = normalize_explanations(a_perturbed, metric.normalize_config)
+    
+        # Predictions for perturbed batch
+        changed_idx = falses(batch_size)
+        if metric.return_nan_when_prediction_changes
+            y_pred_pert_idx = [argmax(col) for col in eachcol(expl_perturbed.output)]
+            changed_idx .= y_pred_orig_idx .!= y_pred_pert_idx
+        end
+
+        # Flatten perturbed explanations and inputs
+        A_perturbed_flat = reshape(a_perturbed_processed, num_features, batch_size)
+        X_perturbed_flat = reshape(x_perturbed, num_features, batch_size)
+
+        # Similarity computation
+        sim_scores = metric.similarity_func(
+            A_orig_flat, A_perturbed_flat,
+            X_orig_flat, X_perturbed_flat;
+            norm_numerator = metric.norm_numerator,
+            norm_denominator = metric.norm_denominator
+        )
+
+        # Mask changed predictions with NaN
+        sim_scores[changed_idx] .= T(NaN)
+        similarities[:, i] = sim_scores
+    end
+
+    # Replace remaining NaNs with -Inf if not returning NaNs
+    if !metric.return_nan_when_prediction_changes
+        similarities[isnan.(similarities)] .= T(-Inf)
+    end
+
+    scores = dropdims(maximum(similarities, dims=2), dims=2)
+    return scores
+end
