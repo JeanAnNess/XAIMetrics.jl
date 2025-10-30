@@ -19,7 +19,6 @@ include("helpers/utils.jl")
 
 # functions
 include("functions/normalize_functions.jl")
-include("functions/pertub_functions.jl")
 include("functions/similarity_function.jl")
 
 # Faithfulness Metrics
@@ -57,6 +56,7 @@ function evaluate(
     y_out = expl.output
     a = expl.val
 
+    # make y into optional, also in lle
     return evaluate(metric, method, x, y, y_out, a; s=s, kwargs...)
 end
 
@@ -96,7 +96,7 @@ export normalize_by_max_abs
 export gaussian_noise
 
 ## similarity
-export distance_euclidean, lipschitz_constant
+export distance_euclidean, distance_manhattan, lipschitz_constant
 
 # Helpers
 export expand_indices

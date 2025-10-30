@@ -20,8 +20,8 @@ TODO: add more perturb functions, add normalization functions
     similarity_func::FS = lipschitz_constant
     norm_numerator::FN = DEFAULT_NORM_FUNC
     norm_denominator::FD = DEFAULT_NORM_FUNC
-    perturb_config::PerturbationConfig = PerturbationConfig()
     return_nan_when_prediction_changes::Bool = false
+    perturb_config::PerturbationConfig = PerturbationConfig()
     normalize_config::NormalizationConfig = NormalizationConfig()
 end
 
@@ -82,10 +82,8 @@ function local_lipschitz_estimate(
     x_perturbed = similar(x)
 
     for i in 1:metric.nr_samples
-        # Perturb input using perturb_input! and metric.perturb_config
         perturb_input!(x_perturbed, x, metric.perturb_config)
 
-        # Explanations for perturbed batch
         expl_perturbed = analyze(x_perturbed, method)
         a_perturbed = expl_perturbed.val
         a_perturbed_processed = normalize_explanations(a_perturbed, metric.normalize_config)
@@ -97,11 +95,9 @@ function local_lipschitz_estimate(
             changed_idx .= y_pred_orig_idx .!= y_pred_pert_idx
         end
 
-        # Flatten perturbed explanations and inputs
         A_perturbed_flat = reshape(a_perturbed_processed, num_features, batch_size)
         X_perturbed_flat = reshape(x_perturbed, num_features, batch_size)
 
-        # Similarity computation
         sim_scores = metric.similarity_func(
             A_orig_flat, A_perturbed_flat,
             X_orig_flat, X_perturbed_flat;

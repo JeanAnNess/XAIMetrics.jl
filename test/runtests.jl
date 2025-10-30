@@ -4,4 +4,5 @@ using XAIMetrics
 @testset "XAIMetrics.jl" begin
     include("test_lle.jl")
     include("test_normalize.jl")
+    include("test_similarity_func.jl")
 end

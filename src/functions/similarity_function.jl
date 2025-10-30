@@ -9,6 +9,11 @@ function distance_euclidean(a::AbstractArray, b::AbstractArray)
     return norm(a-b)
 end
 
+
+function distance_manhattan(a::AbstractArray, b::AbstractArray)
+    return sum(abs.(a .- b))
+end
+
 """
     lipschitz_constant(a, b, c, d; norm_numerator, norm_denominator)
 
@@ -20,7 +25,7 @@ function lipschitz_constant(
     b::AbstractMatrix,
     c::AbstractMatrix,
     d::AbstractMatrix;
-    norm_numerator = distance_euclidean,
+    norm_numerator = distance_manhattan,
     norm_denominator = distance_euclidean
 )
     eps = 1e-10
