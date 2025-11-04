@@ -7,8 +7,6 @@ using LinearAlgebra
 using Random
 using Statistics
 
-const DEFAULT_NORM_FUNC = (x, y) -> norm(x - y) # ggf defaults auslagern? 
-
 # abstracts
 include("abstracts.jl")
 
@@ -23,16 +21,12 @@ include("configurations/normalization_config.jl")
 include("configurations/perturbation_config.jl")
 include("helpers/utils.jl")
 
-# functions
-include("functions/normalize_functions.jl")
-include("functions/similarity_function.jl")
-
 # Faithfulness Metrics
-#include("metrics/faithfulness/pixelflipping_struct.jl")
-#include("metrics/faithfulness/pixelflipping_eval.jl")
 
 # Robustness Metrics
 include("metrics/robustness/locallipschitz.jl")
+
+const DEFAULT_NORM_FUNC = (x, y) -> norm(x - y)
 const DEFAULT_NORM_FUNC = (x, y) -> norm(x - y) # ggf defaults auslagern? 
 
 abstract type ScoreDirection end
@@ -92,7 +86,7 @@ export NormalizationConfig, PerturbationConfig
 #export PixelFlipping
 
 ## Robustness
-export LocalLipschitzEstimate
+export LocalLipschitzEstimate, AvgSensitivity
 
 # Functions
 
