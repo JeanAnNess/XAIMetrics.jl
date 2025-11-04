@@ -12,6 +12,12 @@ const DEFAULT_NORM_FUNC = (x, y) -> norm(x - y) # ggf defaults auslagern?
 # abstracts
 include("abstracts.jl")
 
+# functions
+include("functions/normalize_functions.jl")
+include("functions/similarity_function.jl")
+include("functions/perturbation_functions.jl")
+include("functions/norm_func.jl")
+
 # configurations
 include("configurations/normalization_config.jl")
 include("configurations/perturbation_config.jl")
@@ -27,6 +33,7 @@ include("functions/similarity_function.jl")
 
 # Robustness Metrics
 include("metrics/robustness/locallipschitz.jl")
+const DEFAULT_NORM_FUNC = (x, y) -> norm(x - y) # ggf defaults auslagern? 
 
 abstract type ScoreDirection end
 struct LowerIsBetter <: ScoreDirection end
