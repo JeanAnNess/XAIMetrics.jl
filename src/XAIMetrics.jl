@@ -27,7 +27,6 @@ include("helpers/utils.jl")
 include("metrics/robustness/locallipschitz.jl")
 
 const DEFAULT_NORM_FUNC = (x, y) -> norm(x - y)
-const DEFAULT_NORM_FUNC = (x, y) -> norm(x - y) # ggf defaults auslagern? 
 
 abstract type ScoreDirection end
 struct LowerIsBetter <: ScoreDirection end
