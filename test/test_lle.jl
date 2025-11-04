@@ -3,6 +3,8 @@ using LinearAlgebra
 using Flux
 using ExplainableAI
 
+# This is more of a sanity test, functions used in the metric are tested separately
+
 # model and analyzer
 flux_model = Chain(
     Conv((3, 3), 1 => 4, relu ; pad=(1, 1)), 
@@ -17,9 +19,9 @@ analyzer = InputTimesGradient(flux_model)
     batch_size = 4
     x_batch = rand(Float32, 28, 28, 1, batch_size)
     y_batch = [2, 5, 1, 9]
-
-    perturb_cfg_low_std = PerturbationConfig(perturb_std=0.1)
-    perturb_cfg_high_std = PerturbationConfig(perturb_std=0.8)
+ 
+    perturb_cfg_low_std = PerturbationConfig(gaussian_perturbation!, (; std=0.1))
+    perturb_cfg_high_std = PerturbationConfig(gaussian_perturbation!, (; std=0.8))
     
     @testset "Basic Execution with Analyzer" begin
         metric_low_std = LocalLipschitzEstimate(

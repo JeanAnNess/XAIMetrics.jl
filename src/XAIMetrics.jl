@@ -93,7 +93,7 @@ export LocalLipschitzEstimate
 export normalize_by_max_abs
 
 ## perturbation
-export gaussian_noise
+export gaussian_perturbation!, uniform_noise!, perturb_input!
 
 ## similarity
 export distance_euclidean, distance_manhattan, lipschitz_constant
