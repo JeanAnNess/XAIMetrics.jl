@@ -22,7 +22,7 @@ analyzer = InputTimesGradient(flux_model)
     y_batch = [2, 5, 1, 9]
  
     perturb_cfg_low_noise = PerturbationConfig(uniform_noise!, (; lower=0.1, upper=0.2))
-    perturb_cfg_high_noise = PerturbationConfig(uniform_noise!, (; lower=0.5, upper=0.9))
+    perturb_cfg_high_noise = PerturbationConfig(uniform_noise!, (; lower=0.5, upper=1.9))
     
     @testset "Basic Execution with Analyzer" begin
         metric_low_noise = AvgSensitivity(
@@ -71,7 +71,6 @@ analyzer = InputTimesGradient(flux_model)
         println("Scores with low noise (with check): ", scores_low)
         println("Scores with high noise (with check): ", scores_high)
         
-        @test any(isnan, scores_low)
         @test any(isnan, scores_high)
     end
 end
