@@ -50,3 +50,15 @@ function lipschitz_constant(
     return scores
 end
 
+"""
+    difference(a, b)
+
+Calculate the difference between two images or explanations.
+"""
+function difference(
+    a::AbstractMatrix,
+    b::AbstractMatrix
+)
+    return a-b
+end
+

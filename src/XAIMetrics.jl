@@ -25,8 +25,10 @@ include("helpers/utils.jl")
 
 # Robustness Metrics
 include("metrics/robustness/locallipschitz.jl")
+include("metrics/robustness/avg_sensitivity.jl")
 
 const DEFAULT_NORM_FUNC = (x, y) -> norm(x - y)
+const DEFAULT_SENS_NORM_FUNC = columnwise_l2_norm
 
 abstract type ScoreDirection end
 struct LowerIsBetter <: ScoreDirection end

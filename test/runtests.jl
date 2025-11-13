@@ -5,4 +5,5 @@ using XAIMetrics
     include("test_lle.jl")
     include("test_normalize.jl")
     include("test_similarity_func.jl")
+    include("test_avg_sens.jl")
 end
