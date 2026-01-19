@@ -1,3 +1,5 @@
+using Test
+using XAIMetrics
 using LinearAlgebra
 
 @testset "distance_euclidean" begin

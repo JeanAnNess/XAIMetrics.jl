@@ -1,3 +1,6 @@
+using Test
+using XAIMetrics
+
 using Random
 using LinearAlgebra
 using Flux

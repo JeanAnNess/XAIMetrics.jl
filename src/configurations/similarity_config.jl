@@ -57,7 +57,7 @@ function lipschitz_constant(
     )
 
     # alle matritzen sollen 1-indexing sein. wenn nicht -> error werfen.  Base.oneindexing.  schauen in Common mistakes
-    eps = eps(eltype(a))
+    epsilon = eps(eltype(a))
 
     num_samples = size(a, 2)
     scores = zeros(eltype(a), num_samples)
@@ -70,7 +70,7 @@ function lipschitz_constant(
 
         numerator = norm_numerator(a_col, b_col)
         denominator = norm_denominator(c_col, d_col)
-        scores[i] = numerator / (denominator + eps)
+        scores[i] = numerator / (denominator + epsilon)
     end
 
     return scores
@@ -94,7 +94,7 @@ function sensitivity_ratio(
     A_orig::AbstractMatrix{T}, A_perturbed::AbstractMatrix{T},
     X_orig::AbstractMatrix{T}, X_perturbed::AbstractMatrix{T}; # X args are unused
     norm_numerator, norm_denominator,
-    kwargs... # Accept extra keywords
+    kwargs... 
 ) where T
     sensitivities = A_orig - A_perturbed
     
