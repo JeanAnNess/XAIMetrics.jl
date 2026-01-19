@@ -11,9 +11,6 @@ using Statistics
 include("abstracts.jl")
 
 # functions
-include("functions/normalize_functions.jl")
-include("functions/similarity_function.jl")
-include("functions/perturbation_functions.jl")
 include("functions/norm_func.jl")
 
 # configurations

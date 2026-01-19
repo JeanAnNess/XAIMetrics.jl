@@ -15,3 +15,21 @@ function normalize_explanations(
         return a_batch
     end
 end
+
+# Functions
+
+"""
+    normalize_by_max_abs(batch::AbstractArray)
+
+Normalizes each sample in a batch by dividing by its maximum absolute value.
+This scales each sample to the range [-1, 1].
+"""
+function normalize_by_max_abs(a::AbstractArray, dims)
+    all(iszero, a) && return a
+    return a / maximum(abs, a; dims)
+end
+
+function normalize_by_max_abs(a::AbstractArray)
+    all(iszero, a) && return a
+    return a / maximum(abs, a)
+end
