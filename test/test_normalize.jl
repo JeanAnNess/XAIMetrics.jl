@@ -1,14 +1,8 @@
-# using NPZ
-
-# @testset "Normalize Functions" begin
-# 	a = npzread("npy_arrays/test_array_3x4.npy")
-# 	expected = npzread("npy_arrays/result_normalize_by_max_abs.npy")
-# 	normalized = normalize_by_max_abs(a)
-# 	@test isapprox(normalized, expected; atol=1e-12)
-# end
+using Test
+using XAIMetrics
 
 @testset "normalize_by_max_abs" begin
-    @testset "Global Normalization (default)" begin
+    @testset "Default normalize" begin
         a = [
             1.0 -2.0;
             3.0 -4.0
@@ -18,7 +12,7 @@
             0.25  -0.5;
             0.75 -1.0
         ]
-        result = normalize_by_max_abs(a, nothing)
+        result = normalize_by_max_abs(a)
         @test result ≈ expected
     end
     @testset "Normalize along axis 1" begin
@@ -31,7 +25,7 @@
             0.3333333333333333 -0.5;
             1.0                -1.0
         ]
-        result = normalize_by_max_abs(a, [1])
+        result = normalize_by_max_abs(a, 1)
         @test result ≈ expected
     end
 
@@ -46,11 +40,11 @@
             0.75 -1.0
         ]
 
-        result = normalize_by_max_abs(a, [2])
+        result = normalize_by_max_abs(a, 2)
         @test result ≈ expected
     end
 
-    @testset "3D Normalize (Py axes 0, 1 -> Jl dims 1, 3)" begin
+    @testset "Normalze along multiple axes" begin
         # Python shape (N, H, C) = (2, 2, 2)
         # normalise_axes = [0, 1] (over N and H)
 
@@ -60,7 +54,7 @@
 
         expected = reshape([0.25, 0.5, 0.25, 0.5, 0.75, 1.0, 0.75, 1.0], (2, 2, 2))
 
-        result = normalize_by_max_abs(a, [1, 3])
+        result = normalize_by_max_abs(a, (1, 3))
         @test result ≈ expected
     end
 
@@ -69,6 +63,10 @@
         expected = [0.0 0.0; 0.0 0.0]
 
         result = normalize_by_max_abs(a)
+        @test result == expected
+
+        expected = [0.0 0.0; 0.0 0.0]
+        result = normalize_by_max_abs(a, 1)
         @test result == expected
     end
 
