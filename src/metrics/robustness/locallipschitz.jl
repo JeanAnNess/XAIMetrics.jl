@@ -37,7 +37,7 @@ function evaluate(
         method::AbstractXAIMethod,
         x::AbstractArray{T, N},
         y::AbstractVector{<:Integer}, # true labels
-        y_out::AbstractMatrix{<:Real}, # predicted logits
+        y_pred::AbstractMatrix{<:Real}, # predicted logits
         a::AbstractArray{T, N};
         s::Union{Nothing, AbstractArray{Bool, N}} = nothing
     ) where {T, N}
@@ -47,7 +47,7 @@ function evaluate(
         method,
         x,
         y,
-        y_out,
+        y_pred,
         a
     )
 end
@@ -57,7 +57,7 @@ function local_lipschitz_estimate(
         method::AbstractXAIMethod,
         x::AbstractArray{T, N},
         y::AbstractVector{<:Integer},
-        y_out::AbstractMatrix{<:Real},
+        y_pred::AbstractMatrix{<:Real},
         a::AbstractArray{T, N}
     ) where {T, N}
     # model = method.model
@@ -76,7 +76,7 @@ function local_lipschitz_estimate(
 
     # Original predictions
     if metric.return_nan_when_prediction_changes
-        y_pred_orig_idx = [argmax(col) for col in eachcol(y_out)]
+        y_pred_classes = predicted_classes(y_pred)
     end
 
     x_perturbed = similar(x)
@@ -85,15 +85,15 @@ function local_lipschitz_estimate(
     for i in 1:metric.nr_samples
         perturb_input!(x_perturbed, x, metric.perturb_config)
 
-        expl_perturbed = analyze(x_perturbed, method)
+        expl_perturbed = analyze(x_perturbed, method, IndexSelector(y))
         a_perturbed = expl_perturbed.val
         a_perturbed_processed = normalize_explanations(a_perturbed, metric.normalize_config)
 
         # Predictions for perturbed batch
         changed_idx = falses(batch_size)
         if metric.return_nan_when_prediction_changes
-            y_pred_pert_idx = [argmax(col) for col in eachcol(expl_perturbed.output)]
-            changed_idx .= y_pred_orig_idx .!= y_pred_pert_idx
+            y_pred_perturbed = predicted_classes(expl_perturbed.output)
+            changed_idx .= y_pred_classes .!= y_pred_perturbed
         end
 
         A_perturbed_flat = reshape(a_perturbed_processed, num_features, batch_size)

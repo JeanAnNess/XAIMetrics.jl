@@ -12,10 +12,12 @@ include("abstracts.jl")
 
 # functions
 include("functions/norm_func.jl")
+include("functions/prediction_func.jl")
 
 # configurations
 include("configurations/normalization_config.jl")
 include("configurations/perturbation_config.jl")
+include("configurations/similarity_config.jl")
 include("helpers/utils.jl")
 
 # Faithfulness Metrics
@@ -35,14 +37,14 @@ const lowerisbetter = LowerIsBetter()
 const higherisbetter = HigherIsBetter()
 
 
-"""
+""" 
     evaluate(metric, method, x; y, s)
 """
 function evaluate(
         metric::AbstractXAIMetric,
         method::AbstractXAIMethod,
         x::AbstractArray{T, N};
-        y::AbstractVector{<:Integer},
+        y::AbstractVector{<:Integer}, # batches an bildern, für jedes bild die targetclass
         s::Union{Nothing, AbstractArray{Bool, N}} = nothing,
         kwargs...
     ) where {T, N}
@@ -51,12 +53,12 @@ function evaluate(
         error("Input x must have at least 2 dimensions (features and batch dimension).")
     end
 
-    expl = analyze(x, method)
-    y_out = expl.output
+    expl = analyze(x, method, IndexSelector(y))
+    y_pred = expl.output
     a = expl.val
 
     # make y into optional, also in lle
-    return evaluate(metric, method, x, y, y_out, a; s = s, kwargs...)
+    return evaluate(metric, method, x, y, y_pred, a; s = s, kwargs...) 
 end
 
 
@@ -95,7 +97,7 @@ export normalize_by_max_abs
 export gaussian_perturbation!, uniform_noise!, perturb_input!
 
 ## similarity
-export distance_euclidean, distance_manhattan, lipschitz_constant
+export distance_euclidean, distance_manhattan, lipschitz_constant, difference
 
 # Helpers
 export expand_indices

@@ -28,7 +28,7 @@ function evaluate(
         method::AbstractXAIMethod,
         x::AbstractArray{T, N},
         y::AbstractVector{<:Integer}, # true labels
-        y_out::AbstractMatrix{<:Real}, # predicted logits
+        y_pred::AbstractMatrix{<:Real}, # predicted logits
         a::AbstractArray{T, N};
         s::Union{Nothing, AbstractArray{Bool, N}} = nothing
     ) where {T, N}
@@ -38,7 +38,7 @@ function evaluate(
         method,
         x,
         y,
-        y_out,
+        y_pred,
         a
     )
 end
@@ -53,7 +53,7 @@ function avg_sensitivity_estimate(
         method::AbstractXAIMethod,
         x::AbstractArray{T, N},
         y::AbstractVector{<:Integer},
-        y_out::AbstractMatrix{<:Real},
+        y_pred::AbstractMatrix{<:Real},
         a::AbstractArray{T, N}
     ) where {T, N}
 
@@ -64,32 +64,30 @@ function avg_sensitivity_estimate(
     # Compute initial explanations
     a_processed = normalize_explanations(a, metric.normalize_config)
 
-    # Flatten for similarity computation (features × batch)
-    X_orig_flat = reshape(x, num_features, batch_size)
+    # Flatten for similarity computation (features x batch)
     A_orig_flat = reshape(a_processed, num_features, batch_size)
 
     similarities = Matrix{T}(undef, batch_size, metric.nr_samples)
 
     # Original predictions
     if metric.return_nan_when_prediction_changes
-        y_pred_orig_idx = [argmax(col) for col in eachcol(y_out)]
+        y_pred_classes = predicted_classes(y_pred)
     end
 
     x_perturbed = similar(x)
-    X_perturbed_flat = similar(X_orig_flat) # Pre-allocate flat perturbed input
 
     for i in 1:metric.nr_samples
         perturb_input!(x_perturbed, x, metric.perturb_config)
 
-        expl_perturbed = analyze(x_perturbed, method)
+        expl_perturbed = analyze(x_perturbed, method, IndexSelector(y))
         a_perturbed = expl_perturbed.val
         a_perturbed_processed = normalize_explanations(a_perturbed, metric.normalize_config)
 
         # Predictions for perturbed batch
         changed_idx = falses(batch_size)
         if metric.return_nan_when_prediction_changes
-            y_pred_pert_idx = [argmax(col) for col in eachcol(expl_perturbed.output)]
-            changed_idx .= y_pred_orig_idx .!= y_pred_pert_idx
+            y_pred_perturbed = predicted_classes(expl_perturbed.output)
+            changed_idx .= y_pred_classes .!= y_pred_perturbed
         end
 
         A_perturbed_flat = reshape(a_perturbed_processed, num_features, batch_size)
@@ -105,14 +103,6 @@ function avg_sensitivity_estimate(
         sim_scores[changed_idx] .= T(NaN)
         similarities[:, i] = sim_scores
     end
-
-    # Wahrscheinlich zu ineffizient ...
-    # row_means = [mean(filter(!isnan, row) for row in eachrow(similarities))]
-    # if !metric.return_nan_when_prediction_changes
-    # 	for (i, row) in enumerate(eachrow(similarities))
-    # 		row[isnan.(row)] .= row_means[i]
-    # 	end
-    # end
 
     if metric.return_nan_when_prediction_changes
         scores = dropdims(mean(similarities, dims = 2), dims = 2)

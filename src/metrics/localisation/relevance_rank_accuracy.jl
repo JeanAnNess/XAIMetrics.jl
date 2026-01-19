@@ -22,7 +22,7 @@ function evaluate(
         method::AbstractXAIMethod,
         x::AbstractArray{T, N},
         y::AbstractVector{<:Integer}, # true labels
-        y_out::AbstractMatrix{<:Real}, # predicted logits
+        y_pred::AbstractMatrix{<:Real}, # predicted logits
         a::AbstractArray{T, N};
         s::Union{Nothing, AbstractArray{Bool, N}} = nothing
     ) where {T, N}
@@ -56,6 +56,7 @@ function relevance_rank_accuracy(
 
     scores = Vector{T}(undef, batch_size)
 
+    # alle matritzen sollen 1-indexing sein
     for i in 1:batch_size # would like to use eachcol, but since I access both A and S, wont be possible
         a_instance = @view A_flat[:, i] # attribution
         s_instance = @view S_flat[:, i] # "ground truth"
