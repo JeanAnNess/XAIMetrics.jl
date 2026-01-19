@@ -21,7 +21,7 @@ TODO: add more perturb functions, add normalization functions
     norm_numerator::FN = DEFAULT_NORM_FUNC
     norm_denominator::FD = DEFAULT_NORM_FUNC
     return_nan_when_prediction_changes::Bool = false
-    perturb_config::PerturbationConfig = PerturbationConfig(perturb_func=gaussian_perturbation!, params=(;std=0.2))
+    perturb_config::PerturbationConfig = PerturbationConfig(perturb_func = gaussian_perturbation!, params = (; std = 0.2))
     normalize_config::NormalizationConfig = NormalizationConfig()
 end
 
@@ -33,14 +33,14 @@ scoredirection(::LocalLipschitzEstimate) = lowerisbetter
 Internal function to compute the Local Lipschitz Estimate for a batch of data.
 """
 function evaluate(
-    metric::LocalLipschitzEstimate,
-    method::AbstractXAIMethod,
-    x::AbstractArray{T, N}, 
-    y::AbstractVector{<:Integer}, # true labels
-    y_out::AbstractMatrix{<:Real}, # predicted logits
-    a::AbstractArray{T, N};
-    s::Union{Nothing, AbstractArray{Bool, N}} = nothing
-) where {T, N}
+        metric::LocalLipschitzEstimate,
+        method::AbstractXAIMethod,
+        x::AbstractArray{T, N},
+        y::AbstractVector{<:Integer}, # true labels
+        y_out::AbstractMatrix{<:Real}, # predicted logits
+        a::AbstractArray{T, N};
+        s::Union{Nothing, AbstractArray{Bool, N}} = nothing
+    ) where {T, N}
 
     return local_lipschitz_estimate(
         metric,
@@ -53,17 +53,17 @@ function evaluate(
 end
 
 function local_lipschitz_estimate(
-    metric::LocalLipschitzEstimate,
-    method::AbstractXAIMethod,
-    x::AbstractArray{T, N}, 
-    y::AbstractVector{<:Integer},
-    y_out::AbstractMatrix{<:Real},
-    a::AbstractArray{T, N};
-) where {T, N}
+        metric::LocalLipschitzEstimate,
+        method::AbstractXAIMethod,
+        x::AbstractArray{T, N},
+        y::AbstractVector{<:Integer},
+        y_out::AbstractMatrix{<:Real},
+        a::AbstractArray{T, N}
+    ) where {T, N}
     # model = method.model
     _size = size(x)
     batch_size = _size[end]
-    num_features = prod(_size[1:end-1])
+    num_features = prod(_size[1:(end - 1)])
 
     # Compute initial explanations
     a_processed = normalize_explanations(a, metric.normalize_config)
@@ -88,7 +88,7 @@ function local_lipschitz_estimate(
         expl_perturbed = analyze(x_perturbed, method)
         a_perturbed = expl_perturbed.val
         a_perturbed_processed = normalize_explanations(a_perturbed, metric.normalize_config)
-    
+
         # Predictions for perturbed batch
         changed_idx = falses(batch_size)
         if metric.return_nan_when_prediction_changes
@@ -116,6 +116,6 @@ function local_lipschitz_estimate(
         similarities[isnan.(similarities)] .= T(-Inf)
     end
 
-    scores = dropdims(maximum(similarities, dims=2), dims=2)
+    scores = dropdims(maximum(similarities, dims = 2), dims = 2)
     return scores
 end

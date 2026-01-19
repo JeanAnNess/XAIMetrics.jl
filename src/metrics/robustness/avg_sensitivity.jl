@@ -1,10 +1,18 @@
+"""
+    AvgSensitivity
+
+Compute the average sensitivity of a model with respect to its input features.
+
+This metric measures how much the model's output changes on average, when
+each feature of the input is slightly perturbed.
+"""
 @kwdef struct AvgSensitivity{FS, FN, FD} <: AbstractRobustnessMetric
     nr_samples::Int = 200
     similarity_func::FS = difference
     norm_numerator::FN = DEFAULT_SENS_NORM_FUNC
     norm_denominator::FD = DEFAULT_SENS_NORM_FUNC
     return_nan_when_prediction_changes::Bool = false
-    perturb_config::PerturbationConfig = PerturbationConfig(perturb_func=uniform_noise!)
+    perturb_config::PerturbationConfig = PerturbationConfig(perturb_func = uniform_noise!)
     normalize_config::NormalizationConfig = NormalizationConfig()
 end
 
@@ -16,14 +24,14 @@ scoredirection(::AvgSensitivity) = lowerisbetter
 Internal function to compute the AvgSensitivity for a batch of data.
 """
 function evaluate(
-    metric::AvgSensitivity,
-    method::AbstractXAIMethod,
-    x::AbstractArray{T, N}, 
-    y::AbstractVector{<:Integer}, # true labels
-    y_out::AbstractMatrix{<:Real}, # predicted logits
-    a::AbstractArray{T, N};
-    s::Union{Nothing, AbstractArray{Bool, N}} = nothing
-) where {T, N}
+        metric::AvgSensitivity,
+        method::AbstractXAIMethod,
+        x::AbstractArray{T, N},
+        y::AbstractVector{<:Integer}, # true labels
+        y_out::AbstractMatrix{<:Real}, # predicted logits
+        a::AbstractArray{T, N};
+        s::Union{Nothing, AbstractArray{Bool, N}} = nothing
+    ) where {T, N}
 
     return avg_sensitivity_estimate(
         metric,
@@ -41,17 +49,17 @@ end
 Computes the average sensitivity score.
 """
 function avg_sensitivity_estimate(
-    metric::AvgSensitivity,
-    method::AbstractXAIMethod,
-    x::AbstractArray{T, N}, 
-    y::AbstractVector{<:Integer},
-    y_out::AbstractMatrix{<:Real},
-    a::AbstractArray{T, N};
-) where {T, N}
-    
+        metric::AvgSensitivity,
+        method::AbstractXAIMethod,
+        x::AbstractArray{T, N},
+        y::AbstractVector{<:Integer},
+        y_out::AbstractMatrix{<:Real},
+        a::AbstractArray{T, N}
+    ) where {T, N}
+
     _size = size(x)
     batch_size = _size[end]
-    num_features = prod(_size[1:end-1])
+    num_features = prod(_size[1:(end - 1)])
 
     # Compute initial explanations
     a_processed = normalize_explanations(a, metric.normalize_config)
@@ -76,7 +84,7 @@ function avg_sensitivity_estimate(
         expl_perturbed = analyze(x_perturbed, method)
         a_perturbed = expl_perturbed.val
         a_perturbed_processed = normalize_explanations(a_perturbed, metric.normalize_config)
-    
+
         # Predictions for perturbed batch
         changed_idx = falses(batch_size)
         if metric.return_nan_when_prediction_changes
@@ -90,26 +98,26 @@ function avg_sensitivity_estimate(
         numerator = metric.norm_numerator(sensitivities)
         denominator = metric.norm_denominator(A_orig_flat)
 
-		sim_scores = numerator ./ denominator
-		sim_scores[denominator .== 0] .= T(NaN) #handle zero div
+        sim_scores = numerator ./ denominator
+        sim_scores[denominator .== 0] .= T(NaN) #handle zero div
 
         # Mask changed predictions with NaN
         sim_scores[changed_idx] .= T(NaN)
         similarities[:, i] = sim_scores
     end
 
-	# Wahrscheinlich zu ineffizient ...
-	# row_means = [mean(filter(!isnan, row) for row in eachrow(similarities))]
+    # Wahrscheinlich zu ineffizient ...
+    # row_means = [mean(filter(!isnan, row) for row in eachrow(similarities))]
     # if !metric.return_nan_when_prediction_changes
-	# 	for (i, row) in enumerate(eachrow(similarities))
-	# 		row[isnan.(row)] .= row_means[i]
-	# 	end
+    # 	for (i, row) in enumerate(eachrow(similarities))
+    # 		row[isnan.(row)] .= row_means[i]
+    # 	end
     # end
 
     if metric.return_nan_when_prediction_changes
-        scores = dropdims(mean(similarities, dims=2), dims=2)
+        scores = dropdims(mean(similarities, dims = 2), dims = 2)
     else
         scores = [mean(filter(!isnan, row)) for row in eachrow(similarities)]
     end
     return scores
-end 
+end

@@ -6,7 +6,7 @@ using LinearAlgebra
 Calculate Euclidean distance between two arrays (e.g., images or explanations).
 """
 function distance_euclidean(a::AbstractArray, b::AbstractArray)
-    return norm(a-b)
+    return norm(a - b)
 end
 
 
@@ -21,19 +21,19 @@ Compute the batched local Lipschitz constant for a set of explanations and input
 
 """
 function lipschitz_constant(
-    a::AbstractMatrix,
-    b::AbstractMatrix,
-    c::AbstractMatrix,
-    d::AbstractMatrix;
-    norm_numerator = distance_manhattan,
-    norm_denominator = distance_euclidean
-)
-    eps = 1e-10
+        a::AbstractMatrix,
+        b::AbstractMatrix,
+        c::AbstractMatrix,
+        d::AbstractMatrix;
+        norm_numerator = distance_manhattan,
+        norm_denominator = distance_euclidean
+    )
+    eps = 1.0e-10
     default_dist = (x, y) -> norm(x - y)
     d1 = norm_numerator
     d2 = norm_denominator
 
-    num_samples = size(a, 2) 
+    num_samples = size(a, 2)
     scores = zeros(eltype(a), num_samples)
 
     for i in 1:num_samples
@@ -56,9 +56,8 @@ end
 Calculate the difference between two images or explanations.
 """
 function difference(
-    a::AbstractMatrix,
-    b::AbstractMatrix
-)
-    return a-b
+        a::AbstractMatrix,
+        b::AbstractMatrix
+    )
+    return a - b
 end
-

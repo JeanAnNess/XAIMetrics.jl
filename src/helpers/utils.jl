@@ -6,10 +6,10 @@ at the dimensions specified by `indexed_axes`. All other dimensions are indexed 
 representing a full slice.
 """
 function expand_indices(
-    arr::AbstractArray,
-    indices::Tuple,
-    indexed_axes::AbstractVector{<:Integer}
-)
+        arr::AbstractArray,
+        indices::Tuple,
+        indexed_axes::AbstractVector{<:Integer}
+    )
     nd = ndims(arr)
     sorted_axes = sort(collect(indexed_axes))
 
@@ -24,7 +24,7 @@ function expand_indices(
     end
 
     full_indices = Vector{Any}(undef, nd)
-    
+
     fill!(full_indices, :)
 
     # Place indices at specified axes
@@ -37,10 +37,10 @@ end
 
 
 function expand_indices(
-    arr::AbstractArray,
-    linear_indices::AbstractVector{<:Integer},
-    indexed_axes::AbstractVector{<:Integer}
-)
+        arr::AbstractArray,
+        linear_indices::AbstractVector{<:Integer},
+        indexed_axes::AbstractVector{<:Integer}
+    )
     sorted_axes = sort(collect(indexed_axes))
     subspace_dims = tuple((size(arr, d) for d in sorted_axes)...)
     cartesian_indices = CartesianIndices(subspace_dims)[linear_indices]
@@ -53,9 +53,9 @@ function expand_indices(
 end
 
 function expand_indices(
-    arr::AbstractArray,
-    linear_index::Integer,
-    indexed_axes::AbstractVector{<:Integer}
-)
+        arr::AbstractArray,
+        linear_index::Integer,
+        indexed_axes::AbstractVector{<:Integer}
+    )
     return expand_indices(arr, [linear_index], indexed_axes)
 end

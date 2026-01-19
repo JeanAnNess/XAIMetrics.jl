@@ -1,7 +1,7 @@
 module XAIMetrics # Rename XAIMetrics
 
 using XAIBase: AbstractXAIMethod, IndexSelector, analyze
-using Base: @kwdef 
+using Base: @kwdef
 using LinearAlgebra
 
 using Random
@@ -42,13 +42,13 @@ const higherisbetter = HigherIsBetter()
     evaluate(metric, method, x; y, s)
 """
 function evaluate(
-    metric::AbstractXAIMetric,
-    method::AbstractXAIMethod,
-    x::AbstractArray{T, N};
-    y::AbstractVector{<:Integer},
-    s::Union{Nothing, AbstractArray{Bool, N}} = nothing,
-    kwargs...
-) where {T, N}
+        metric::AbstractXAIMetric,
+        method::AbstractXAIMethod,
+        x::AbstractArray{T, N};
+        y::AbstractVector{<:Integer},
+        s::Union{Nothing, AbstractArray{Bool, N}} = nothing,
+        kwargs...
+    ) where {T, N}
 
     if N < 2
         error("Input x must have at least 2 dimensions (features and batch dimension).")
@@ -59,11 +59,11 @@ function evaluate(
     a = expl.val
 
     # make y into optional, also in lle
-    return evaluate(metric, method, x, y, y_out, a; s=s, kwargs...)
+    return evaluate(metric, method, x, y, y_out, a; s = s, kwargs...)
 end
 
 
-export evaluate 
+export evaluate
 
 # Abstracts
 export AbstractXAIMetric
@@ -103,4 +103,4 @@ export distance_euclidean, distance_manhattan, lipschitz_constant
 # Helpers
 export expand_indices
 
-end # module 
+end # module

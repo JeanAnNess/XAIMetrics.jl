@@ -3,7 +3,7 @@ function frobenius_norm(a::AbstractArray{T, N}) where {T, N}
     return sqrt(sum(abs2, a))
 end
 
-function columnwise_l2_norm(A::AbstractMatrix{T}) where T
+function columnwise_l2_norm(A::AbstractMatrix{T}) where {T}
     norms = [sqrt(sum(abs2, col)) for col in eachcol(A)]
     return norms'
 end
