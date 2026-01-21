@@ -74,11 +74,6 @@ function local_lipschitz_estimate(
 
     similarities = Matrix{T}(undef, batch_size, metric.nr_samples)
 
-    # Original predictions
-    if metric.return_nan_when_prediction_changes
-        y_pred_classes = predicted_classes(y_pred)
-    end
-
     x_perturbed = similar(x)
     X_perturbed_flat = similar(X_orig_flat)
 
@@ -92,6 +87,7 @@ function local_lipschitz_estimate(
         # Predictions for perturbed batch
         changed_idx = falses(batch_size)
         if metric.return_nan_when_prediction_changes
+			y_pred_classes = predicted_classes(y_pred)
             y_pred_perturbed = predicted_classes(expl_perturbed.output)
             changed_idx .= y_pred_classes .!= y_pred_perturbed
         end
