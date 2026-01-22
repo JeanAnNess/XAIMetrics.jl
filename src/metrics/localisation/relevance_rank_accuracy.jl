@@ -79,4 +79,4 @@ function relevance_rank_accuracy(
     end
 
     return scores
-end 
+end

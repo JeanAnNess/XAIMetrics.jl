@@ -11,10 +11,10 @@ end
 Dispatches to the similarity function defined in the `config`.
 """
 function compute_similarity(
-    config::SimilarityConfig,
-    A_orig::AbstractMatrix, A_perturbed::AbstractMatrix,
-    X_orig::AbstractMatrix, X_perturbed::AbstractMatrix
-)
+        config::SimilarityConfig,
+        A_orig::AbstractMatrix, A_perturbed::AbstractMatrix,
+        X_orig::AbstractMatrix, X_perturbed::AbstractMatrix
+    )
     return config.similarity_func(
         A_orig, A_perturbed,
         X_orig, X_perturbed;
@@ -32,7 +32,7 @@ end
 Calculate Euclidean distance between two arrays (e.g., images or explanations).
 """
 function distance_euclidean(a::AbstractArray, b::AbstractArray)
-    return norm(a-b)
+    return norm(a - b)
 end
 
 
@@ -82,7 +82,7 @@ end
 Calculate the difference between two images or explanations.
 """
 function difference(a::AbstractMatrix, b::AbstractMatrix)
-    return a-b
+    return a - b
 end
 
 """
@@ -91,19 +91,19 @@ end
 Computes the ratio `norm_numerator(A_orig - A_perturbed) / norm_denominator(A_orig)`.
 """
 function sensitivity_ratio(
-    A_orig::AbstractMatrix{T}, A_perturbed::AbstractMatrix{T},
-    X_orig::AbstractMatrix{T}, X_perturbed::AbstractMatrix{T}; # X args are unused
-    norm_numerator, norm_denominator,
-    kwargs... 
-) where T
+        A_orig::AbstractMatrix{T}, A_perturbed::AbstractMatrix{T},
+        X_orig::AbstractMatrix{T}, X_perturbed::AbstractMatrix{T}; # X args are unused
+        norm_numerator, norm_denominator,
+        kwargs...
+    ) where {T}
     sensitivities = A_orig - A_perturbed
-    
+
     numerator = norm_numerator(sensitivities)     # Shape (1, batch_size)
     denominator = norm_denominator(A_orig)       # Shape (1, batch_size)
-    
+
     # Handle division by zero
     ratio = numerator ./ denominator
-    
+
     # Set to NaN if denominator was 0
     ratio[denominator .== 0] .= T(NaN)
 

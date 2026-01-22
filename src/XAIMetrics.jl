@@ -58,7 +58,7 @@ function evaluate(
     a = expl.val
 
     # make y into optional, also in lle
-    return evaluate(metric, method, x, y, y_pred, a; s = s, kwargs...) 
+    return evaluate(metric, method, x, y, y_pred, a; s = s, kwargs...)
 end
 
 
