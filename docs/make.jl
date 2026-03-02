@@ -31,7 +31,7 @@ makedocs(;
     sitename = "XAIMetrics.jl",
     format = Documenter.HTML(;
         canonical = "https://JeanAnNess.github.io/XAIMetrics.jl",
-        edit_link = "master",
+        edit_link = "main",
         assets = String[],
     ),
     pages = [
@@ -57,6 +57,6 @@ makedocs(;
 
 deploydocs(;
     repo = "github.com/JeanAnNess/XAIMetrics.jl",
-    devbranch = "master",
+    devbranch = "main",
     push_preview = true,
 )
