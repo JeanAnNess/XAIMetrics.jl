@@ -3,6 +3,7 @@ module XAIMetrics # Rename XAIMetrics
 using XAIBase: AbstractXAIMethod, IndexSelector, analyze
 using Base: @kwdef
 using LinearAlgebra
+using Distributions: Sampleable, Normal, Uniform
 
 using Random
 using Statistics
@@ -13,6 +14,9 @@ include("abstracts.jl")
 # functions
 include("functions/norm_func.jl")
 include("functions/prediction_func.jl")
+include("functions/normalizations.jl")
+include("functions/perturbations.jl")
+include("functions/similarities.jl")
 
 # configurations
 include("configurations/normalization_config.jl")
@@ -69,7 +73,7 @@ export AbstractAxiomaticMetric, AbstractComplexityMetric, AbstractLocalisationMe
 export AbstractRandomisationMetric, AbstractFaithfulnessMetric, AbstractRobustnessMetric
 
 # Configurations
-export NormalizationConfig, PerturbationConfig
+export NormalizationConfig, PerturbationConfig, SimilarityConfig
 
 # Metrics
 
