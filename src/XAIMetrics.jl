@@ -18,7 +18,6 @@ include("functions/prediction_func.jl")
 include("configurations/normalization_config.jl")
 include("configurations/perturbation_config.jl")
 include("configurations/similarity_config.jl")
-include("helpers/utils.jl")
 
 # Faithfulness Metrics
 
@@ -91,15 +90,12 @@ export LocalLipschitzEstimate, AvgSensitivity
 # Functions
 
 ## normalization
-export normalize_by_max_abs
+export normalize_by_max_abs, stable_division
 
 ## perturbation
 export gaussian_perturbation!, uniform_noise!, perturb_input!
 
 ## similarity
 export distance_euclidean, distance_manhattan, lipschitz_constant, difference
-
-# Helpers
-export expand_indices
 
 end # module

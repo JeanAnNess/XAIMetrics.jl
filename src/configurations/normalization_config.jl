@@ -25,20 +25,44 @@ julia> normalize_by_max_abs(A, 1)
  1.0       -1.0
 ```
 """
-function normalize_by_max_abs(a::AbstractArray, dims)
+function normalize_by_max_abs(a::AbstractArray{T}, dims) where {T}
     all(iszero, a) && return a
-    return a ./ maximum(abs, a; dims)
+    return a ./ maximum(abs, a; dims) #machine eps via  function stabilize_denom
 end
 
-function normalize_by_max_abs(a::AbstractArray)
+function normalize_by_max_abs(a::AbstractArray) # Siehe oben
     all(iszero, a) && return a
     return a ./ maximum(abs, a)
 end
 
+function stable_division(numerator::AbstractArray{T}, denominator::AbstractArray{T}) where {T}
+    S = float(T)
+    epsilon = eps(S)
+    return S.(numerator) ./ (S.(denominator) .+ epsilon)
+end
+
+function stable_division(numerator::Number, denominator::Number)
+    S = float(promote_type(typeof(numerator), typeof(denominator)))
+    epsilon = eps(S)
+    return S(numerator) / (S(denominator) + epsilon)
+end
+
+function stable_division(numerator::AbstractArray, denominator::Number)
+    S = float(promote_type(eltype(numerator), typeof(denominator)))
+    epsilon = eps(S)
+    return S.(numerator) ./ (S(denominator) .+ epsilon)
+end
+
+function stable_division(numerator::Number, denominator::AbstractArray)
+    S = float(promote_type(typeof(numerator), eltype(denominator)))
+    epsilon = eps(S)
+    return S(numerator) ./ (S.(denominator) .+ epsilon)
+end
+
 # Struct
-struct NormalizationConfig
+struct NormalizationConfig{F<: Function}
     normalize::Bool
-    normalize_func::Function
+    normalize_func::F # siehe perturbations
 
     NormalizationConfig(; normalize::Bool = true, normalize_func::Function = normalize_by_max_abs) = new(normalize, normalize_func)
 end
@@ -46,7 +70,7 @@ end
 function normalize_explanations(
         a_batch::AbstractArray{T, N},
         config::NormalizationConfig
-    ) where {T, N}
+    )
     if config.normalize
         return config.normalize_func(a_batch)
     else

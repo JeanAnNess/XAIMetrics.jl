@@ -1,6 +1,6 @@
-struct PerturbationConfig
-    perturb_func::Function
-    params::NamedTuple
+struct PerturbationConfig{F<: Function, D<: Sampleable} #  import Distributions:Sampleable
+    perturb_func::F
+    distributions::D
 end
 
 """
