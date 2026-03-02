@@ -1,0 +1,105 @@
+module XAIMetrics # Rename XAIMetrics
+
+using XAIBase: AbstractXAIMethod, IndexSelector, analyze
+using Base: @kwdef
+using LinearAlgebra
+using Distributions: Sampleable, Normal, Uniform
+
+using Random
+using Statistics
+
+# abstracts
+include("abstracts.jl")
+
+# functions
+include("functions/norm_func.jl")
+include("functions/prediction_func.jl")
+include("functions/normalizations.jl")
+include("functions/perturbations.jl")
+include("functions/similarities.jl")
+
+# configurations
+include("configurations/normalization_config.jl")
+include("configurations/perturbation_config.jl")
+include("configurations/similarity_config.jl")
+
+# Faithfulness Metrics
+
+# Robustness Metrics
+include("metrics/robustness/locallipschitz.jl")
+include("metrics/robustness/avg_sensitivity.jl")
+
+const DEFAULT_NORM_FUNC = (x, y) -> norm(x - y)
+const DEFAULT_SENS_NORM_FUNC = columnwise_l2_norm
+
+abstract type ScoreDirection end
+struct LowerIsBetter <: ScoreDirection end
+struct HigherIsBetter <: ScoreDirection end
+
+const lowerisbetter = LowerIsBetter()
+const higherisbetter = HigherIsBetter()
+
+
+""" 
+    evaluate(metric, method, x; y, s)
+"""
+function evaluate(
+        metric::AbstractXAIMetric,
+        method::AbstractXAIMethod,
+        x::AbstractArray{T, N};
+        y::AbstractVector{<:Integer}, # batches an bildern, für jedes bild die targetclass
+        s::Union{Nothing, AbstractArray{Bool, N}} = nothing,
+        kwargs...
+    ) where {T, N}
+
+    if N < 2
+        error("Input x must have at least 2 dimensions (features and batch dimension).")
+    end
+
+    expl = analyze(x, method, IndexSelector(y))
+    y_pred = expl.output
+    a = expl.val
+
+    # make y into optional, also in lle
+    return evaluate(metric, method, x, y, y_pred, a; s = s, kwargs...)
+end
+
+
+export evaluate
+
+# Abstracts
+export AbstractXAIMetric
+export AbstractAxiomaticMetric, AbstractComplexityMetric, AbstractLocalisationMetric
+export AbstractRandomisationMetric, AbstractFaithfulnessMetric, AbstractRobustnessMetric
+
+# Configurations
+export NormalizationConfig, PerturbationConfig, SimilarityConfig
+
+# Metrics
+
+## Axoimatic
+
+## Complexity
+
+## Localisation
+
+## Randomisation
+
+## Faithfulness
+#export PixelFlipping
+
+## Robustness
+export LocalLipschitzEstimate, AvgSensitivity
+
+# Functions
+
+## normalization
+export normalize_by_max_abs, stable_division
+
+## perturbation
+export gaussian_perturbation!, uniform_noise!, perturb_input!
+
+## similarity
+export distance_euclidean, distance_manhattan, lipschitz_constant, difference
+
+end # module

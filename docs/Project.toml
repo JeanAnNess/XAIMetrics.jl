@@ -1,3 +1,7 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-ExplanationMetrics = "e7195dda-7263-482e-a02a-16fc3aed5685"
+ExplainableAI = "4f1bc3e1-d60d-4ed0-9367-9bdff9846d3b"
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
+LiveServer = "16fef848-5104-11e9-1b77-fb7a48bbb589"
+XAIMetrics = "e7195dda-7263-482e-a02a-16fc3aed5685"

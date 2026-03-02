@@ -23,7 +23,8 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.11'
+          - 'lts'
+          - '1.12'
         os:
           - ubuntu-latest
         arch:
@@ -38,7 +39,9 @@ jobs:
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
+        if: matrix.version == 'lts'
       - uses: codecov/codecov-action@v4
+        if: matrix.version == 'lts'
         with:
           files: lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -71,6 +74,6 @@ jobs:
         shell: julia --project=docs --color=yes {0}
         run: |
           using Documenter: DocMeta, doctest
-          using ExplanationMetrics
-          DocMeta.setdocmeta!(ExplanationMetrics, :DocTestSetup, :(using ExplanationMetrics); recursive=true)
-          doctest(ExplanationMetrics)
+          using XAIMetrics
+          DocMeta.setdocmeta!(XAIMetrics, :DocTestSetup, :(using XAIMetrics); recursive=true)
+          doctest(XAIMetrics)
