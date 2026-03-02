@@ -5,14 +5,6 @@
 Robustness metric that tests the consistency in the explanation for neighboring examples
 by estimating the local Lipschitz constant.
 
-## Keyword arguments
-- `nr_samples::Int`: The number of Monte Carlo samples iterated
-- `similarity_func::Function`: Function to compute the Lipschitz ratio.
-- `norm_numerator::Function`: Function for norm calculations on the numerator (distance between explanations).
-- `norm_denominator::Function`: Function for norm calculations on the denominator (distance between inputs).
-- `perturb_std::Float64`: The standard deviation of the Gaussian noise added for perturbation (default: 0.1).
-- `return_nan_when_prediction_changes::Bool`: If true, samples where the model's prediction changes after perturbation are ignored (result is NaN for that sample).
-
 TODO: add more perturb functions, add normalization functions
 """
 @kwdef struct LocalLipschitzEstimate{FS, FN, FD} <: AbstractRobustnessMetric
@@ -21,7 +13,7 @@ TODO: add more perturb functions, add normalization functions
     norm_numerator::FN = DEFAULT_NORM_FUNC
     norm_denominator::FD = DEFAULT_NORM_FUNC
     return_nan_when_prediction_changes::Bool = false
-    perturb_config::PerturbationConfig = PerturbationConfig(perturb_func = gaussian_perturbation!, params = (; std = 0.2))
+    perturb_config::PerturbationConfig = PerturbationConfig(gaussian_perturbation!; params = (; std = 0.2))
     normalize_config::NormalizationConfig = NormalizationConfig()
 end
 

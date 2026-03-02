@@ -12,7 +12,7 @@ each feature of the input is slightly perturbed.
     norm_numerator::FN = DEFAULT_SENS_NORM_FUNC
     norm_denominator::FD = DEFAULT_SENS_NORM_FUNC
     return_nan_when_prediction_changes::Bool = false
-    perturb_config::PerturbationConfig = PerturbationConfig(perturb_func = uniform_noise!)
+    perturb_config::PerturbationConfig = PerturbationConfig(uniform_noise!)
     normalize_config::NormalizationConfig = NormalizationConfig()
 end
 
@@ -43,11 +43,6 @@ function evaluate(
     )
 end
 
-"""
-    avg_sensitivity_estimate(...)
-
-Computes the average sensitivity score.
-"""
 function avg_sensitivity_estimate(
         metric::AvgSensitivity,
         method::AbstractXAIMethod,

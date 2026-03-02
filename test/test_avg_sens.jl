@@ -24,8 +24,8 @@ analyzer = InputTimesGradient(flux_model)
     x_batch = rand(Float32, 28, 28, 1, batch_size)
     y_batch = [2, 5, 1, 9]
 
-    perturb_cfg_low_noise = PerturbationConfig(uniform_noise!, (; lower = 0.1, upper = 0.2))
-    perturb_cfg_high_noise = PerturbationConfig(uniform_noise!, (; lower = 0.5, upper = 1.9))
+    perturb_cfg_low_noise = PerturbationConfig(uniform_noise!; params = (; lower = 0.1, upper = 0.2))
+    perturb_cfg_high_noise = PerturbationConfig(uniform_noise!; params = (; lower = 0.5, upper = 1.9))
 
     @testset "Basic Execution with Analyzer" begin
         metric_low_noise = AvgSensitivity(
