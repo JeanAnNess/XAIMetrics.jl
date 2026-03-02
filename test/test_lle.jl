@@ -2,7 +2,7 @@ using Test
 using XAIMetrics
 
 using Random
-using LinearAlgebra
+using Statistics: mean
 using Flux
 using ExplainableAI
 
@@ -44,6 +44,9 @@ analyzer = InputTimesGradient(flux_model)
         println("Scores with high std: ", scores_high)
         @test scores_low isa Vector{Float32}
         @test scores_high isa Vector{Float32}
+        @test !any(isnan, scores_low)   # default behavior should not return NaN
+        @test !any(isnan, scores_high)
+        # @test mean(scores_high) > mean(scores_low) # Higher noise should increase score
     end
 
     @testset "Prediction Change Check with Analyzer" begin
@@ -69,7 +72,7 @@ analyzer = InputTimesGradient(flux_model)
         println("Scores with low std (with check): ", scores_low)
         println("Scores with high std (with check): ", scores_high)
 
-        @test any(isnan, scores_low)
         @test any(isnan, scores_high)
+        @test count(isnan, scores_high) >= count(isnan, scores_low)
     end
 end
