@@ -8,7 +8,8 @@ using ExplainableAI
 using Statistics
 
 # This is more of a sanity test, functions used in the metric are tested separately
-
+ENV["XAIMETRICS_DEBUG"] = "false"
+ENV["XAIMETRICS_DEBUG_EVERY"] = "1"
 # model and analyzer
 flux_model = Chain(
     Conv((3, 3), 1 => 4, relu; pad = (1, 1)),
