@@ -44,7 +44,7 @@ println("Assets directory: $ASSETS_DIR")
 
     @testset "Metric: Average Sensitivity" begin
         @info "Evaluating AvgSensitivity..."
-        perturb_cfg = PerturbationConfig(uniform_noise!; params = (; lower = 0.2))
+        perturb_cfg = PerturbationConfig(uniform_noise!, (; lower = 0.2))
         metric = AvgSensitivity(
             nr_samples=10,
             perturb_config=perturb_cfg
@@ -57,7 +57,7 @@ println("Assets directory: $ASSETS_DIR")
 
     @testset "Metric: Local Lipschitz Estimate" begin
         @info "Evaluating LocalLipschitzEstimate..."
-        perturb_cfg = PerturbationConfig(gaussian_perturbation!; params = (; std = 0.2))
+        perturb_cfg = PerturbationConfig(gaussian_perturbation!, (; std = 0.2))
         metric = LocalLipschitzEstimate(
             nr_samples=10,
             perturb_config=perturb_cfg

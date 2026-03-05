@@ -40,8 +40,8 @@ y = rand(1:10, batch_size)
 metric = AvgSensitivity(
     nr_samples = 30,
     perturb_config = PerturbationConfig(
-        uniform_noise!;
-        params = (; lower = 0.05, upper = 0.1),
+        uniform_noise!,
+        (; lower = 0.05, upper = 0.1),
     ),
 )
 
@@ -53,8 +53,8 @@ scores = evaluate(metric, method, x; y = y)
 lle_metric = LocalLipschitzEstimate(
     nr_samples = 50,
     perturb_config = PerturbationConfig(
-        gaussian_perturbation!;
-        params = (; std = 0.2),
+        gaussian_perturbation!,
+        (; std = 0.2),
     ),
     return_nan_when_prediction_changes = false,
 )
@@ -64,8 +64,8 @@ lle_scores = evaluate(lle_metric, method, x; y = y)
 # ## Configuring behavior
 # ### Perturbations
 cfg_uniform = PerturbationConfig(
-    uniform_noise!; 
-    params = (; lower = 0.03, upper = 0.08))
+    uniform_noise!,
+    (; lower = 0.03, upper = 0.08))
 
 # ### Normalization
 norm_cfg = NormalizationConfig(
@@ -86,7 +86,7 @@ Random.seed!(7)
 x_demo = Float32[0.2, -0.4, 0.8]
 x_demo_pert = similar(x_demo)
 
-demo_pert_cfg = PerturbationConfig(uniform_noise!; params = (; lower = 0.03, upper = 0.08))
+demo_pert_cfg = PerturbationConfig(uniform_noise!, (; lower = 0.03, upper = 0.08))
 perturb_input!(x_demo_pert, x_demo, demo_pert_cfg)
 
 println("x_demo          = ", x_demo)

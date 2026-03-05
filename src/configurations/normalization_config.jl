@@ -9,9 +9,10 @@ Configuration for explanation normalization in metric pipelines.
 struct NormalizationConfig{F<: Function}
     normalize::Bool
     normalize_func::F # siehe perturbations
-
-    NormalizationConfig(; normalize::Bool = true, normalize_func::F = normalize_by_max_abs) where {F} = new{F}(normalize, normalize_func)
 end
+
+NormalizationConfig(normalize::Bool, normalize_func=normalize_by_max_abs) = NormalizationConfig{typeof(normalize_func)}(normalize, normalize_func)
+NormalizationConfig(; normalize::Bool=true, normalize_func=normalize_by_max_abs) = NormalizationConfig(normalize, normalize_func)
 
 """
     normalize_explanations(a_batch, config)

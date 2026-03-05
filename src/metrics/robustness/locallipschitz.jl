@@ -13,7 +13,7 @@ TODO: add more perturb functions, add normalization functions
     norm_numerator::FN = DEFAULT_NORM_FUNC
     norm_denominator::FD = DEFAULT_NORM_FUNC
     return_nan_when_prediction_changes::Bool = false
-    perturb_config::PerturbationConfig = PerturbationConfig(gaussian_perturbation!; params = (; std = 0.2))
+    perturb_config::PerturbationConfig = PerturbationConfig(gaussian_perturbation!, (; std = 0.2))
     normalize_config::NormalizationConfig = NormalizationConfig()
 end
 

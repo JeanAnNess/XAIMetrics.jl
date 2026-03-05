@@ -42,7 +42,7 @@ x_batch = rand(Float32, 224, 224, 3, batch_size)
 y_batch = rand(1:1000, batch_size)
 
 # Configure perturbation and metric
-perturb_cfg = PerturbationConfig(uniform_noise!; params = (; lower = 0.1f0, upper = 0.2f0))
+perturb_cfg = PerturbationConfig(uniform_noise!, (; lower = 0.1f0, upper = 0.2f0))
 metric = AvgSensitivity(
 	nr_samples = 20,
 	perturb_config = perturb_cfg,
