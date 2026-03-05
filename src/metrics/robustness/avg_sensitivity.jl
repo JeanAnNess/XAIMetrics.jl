@@ -51,7 +51,6 @@ function avg_sensitivity_estimate(
         y_pred::AbstractMatrix{<:Real},
         a::AbstractArray{T, N}
     ) where {T, N}
-
     _size = size(x)
     batch_size = _size[end]
     num_features = prod(_size[1:(end - 1)])

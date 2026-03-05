@@ -1,9 +1,9 @@
-struct PerturbationConfig{F<:Function, D<:Sampleable}
+struct PerturbationConfig{F <: Function, D <: Sampleable}
     perturb_func::F
     distribution::D
 
-    function PerturbationConfig(perturb_func::F, distribution::D) where {F<:Function, D<:Sampleable}
-        new{F, D}(perturb_func, distribution)
+    function PerturbationConfig(perturb_func::F, distribution::D) where {F <: Function, D <: Sampleable}
+        return new{F, D}(perturb_func, distribution)
     end
 end
 """
@@ -34,7 +34,7 @@ perturb_input!(x_uniform, x, cfg_uniform)
 # gaussian
 PerturbationConfig(::typeof(gaussian_perturbation!)) =
     PerturbationConfig(gaussian_perturbation!, Normal(0.0, 0.1))
-    
+
 PerturbationConfig(::typeof(gaussian_perturbation!), params::NamedTuple) =
     PerturbationConfig(gaussian_perturbation!, Normal(get(params, :mean, 0.0), params.std))
 
@@ -58,4 +58,3 @@ function perturb_input!(
     ) where {T}
     return config.perturb_func(x_perturbed, x_batch, config.distribution)
 end
- 

@@ -6,13 +6,13 @@ Configuration for explanation normalization in metric pipelines.
 - `normalize`: enables/disables normalization
 - `normalize_func`: callable applied to explanation batches when normalization is enabled
 """
-struct NormalizationConfig{F<: Function}
+struct NormalizationConfig{F <: Function}
     normalize::Bool
     normalize_func::F # siehe perturbations
 end
 
-NormalizationConfig(normalize::Bool, normalize_func=normalize_by_max_abs) = NormalizationConfig{typeof(normalize_func)}(normalize, normalize_func)
-NormalizationConfig(; normalize::Bool=true, normalize_func=normalize_by_max_abs) = NormalizationConfig(normalize, normalize_func)
+NormalizationConfig(normalize::Bool, normalize_func = normalize_by_max_abs) = NormalizationConfig{typeof(normalize_func)}(normalize, normalize_func)
+NormalizationConfig(; normalize::Bool = true, normalize_func = normalize_by_max_abs) = NormalizationConfig(normalize, normalize_func)
 
 """
     normalize_explanations(a_batch, config)

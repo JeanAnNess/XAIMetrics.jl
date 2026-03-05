@@ -24,13 +24,13 @@ julia> normalize_by_max_abs(A, 1)
 ```
 """
 function normalize_by_max_abs(a::AbstractArray{T}, dims) where {T}
-	all(iszero, a) && return a
-	return a ./ maximum(abs, a; dims)
+    all(iszero, a) && return a
+    return a ./ maximum(abs, a; dims)
 end
 
 function normalize_by_max_abs(a::AbstractArray)
-	all(iszero, a) && return a
-	return a ./ maximum(abs, a)
+    all(iszero, a) && return a
+    return a ./ maximum(abs, a)
 end
 
 """
@@ -40,25 +40,25 @@ Perform division with an epsilon-stabilized denominator to reduce division-by-ze
 instabilities for scalar and array inputs.
 """
 function stable_division(numerator::AbstractArray{T}, denominator::AbstractArray{T}) where {T}
-	S = float(T)
-	epsilon = eps(S)
-	return S.(numerator) ./ (S.(denominator) .+ epsilon)
+    S = float(T)
+    epsilon = eps(S)
+    return S.(numerator) ./ (S.(denominator) .+ epsilon)
 end
 
 function stable_division(numerator::Number, denominator::Number)
-	S = float(promote_type(typeof(numerator), typeof(denominator)))
-	epsilon = eps(S)
-	return S(numerator) / (S(denominator) + epsilon)
+    S = float(promote_type(typeof(numerator), typeof(denominator)))
+    epsilon = eps(S)
+    return S(numerator) / (S(denominator) + epsilon)
 end
 
 function stable_division(numerator::AbstractArray, denominator::Number)
-	S = float(promote_type(eltype(numerator), typeof(denominator)))
-	epsilon = eps(S)
-	return S.(numerator) ./ (S(denominator) .+ epsilon)
+    S = float(promote_type(eltype(numerator), typeof(denominator)))
+    epsilon = eps(S)
+    return S.(numerator) ./ (S(denominator) .+ epsilon)
 end
 
 function stable_division(numerator::Number, denominator::AbstractArray)
-	S = float(promote_type(typeof(numerator), eltype(denominator)))
-	epsilon = eps(S)
-	return S(numerator) ./ (S.(denominator) .+ epsilon)
+    S = float(promote_type(typeof(numerator), eltype(denominator)))
+    epsilon = eps(S)
+    return S(numerator) ./ (S.(denominator) .+ epsilon)
 end
