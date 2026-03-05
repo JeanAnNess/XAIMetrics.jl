@@ -8,7 +8,7 @@ Configuration for explanation normalization in metric pipelines.
 """
 struct NormalizationConfig{F <: Function}
     normalize::Bool
-    normalize_func::F # siehe perturbations
+    normalize_func::F
 end
 
 NormalizationConfig(normalize::Bool, normalize_func = normalize_by_max_abs) = NormalizationConfig{typeof(normalize_func)}(normalize, normalize_func)

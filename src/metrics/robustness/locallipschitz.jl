@@ -4,8 +4,6 @@
 
 Robustness metric that tests the consistency in the explanation for neighboring examples
 by estimating the local Lipschitz constant.
-
-TODO: add more perturb functions, add normalization functions
 """
 @kwdef struct LocalLipschitzEstimate{FS, FN, FD} <: AbstractRobustnessMetric
     nr_samples::Int = 200
