@@ -58,5 +58,4 @@ makedocs(;
 deploydocs(;
     repo = "github.com/JeanAnNess/XAIMetrics.jl",
     devbranch = "main",
-    push_preview = true,
 )
