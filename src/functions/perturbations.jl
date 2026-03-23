@@ -1,22 +1,20 @@
-# Perturbation functions
+function _additive_noise!(x_perturbed, x_batch, distribution::Sampleable, rng::AbstractRNG)
+    rand!(rng, distribution, x_perturbed)
+    return x_perturbed .= x_batch .+ x_perturbed
+end
+
 """
     gaussian_perturbation!(x_perturbed, x_batch, distribution)
-
-Sample additive Gaussian-like noise from `distribution` into `x_perturbed`
-and return `x_batch .+ noise` in place.
+Additive Gaussian noise sampled from `distribution`.
 """
-function gaussian_perturbation!(x_perturbed, x_batch, distribution::Sampleable)
-    rand!(distribution, x_perturbed)
-    return x_perturbed .= x_batch .+ x_perturbed
-end
-
+gaussian_perturbation!(x_perturbed, x_batch, d::Sampleable, rng::AbstractRNG) =
+    _additive_noise!(x_perturbed, x_batch, d, rng)
 """
     uniform_noise!(x_perturbed, x_batch, distribution)
-
-Sample additive uniform-like noise from `distribution` into `x_perturbed`
-and return `x_batch .+ noise` in place.
+Additive uniform noise sampled from `distribution`.
 """
-function uniform_noise!(x_perturbed, x_batch, distribution::Sampleable)
-    rand!(distribution, x_perturbed)
-    return x_perturbed .= x_batch .+ x_perturbed
-end
+uniform_noise!(x_perturbed, x_batch, d::Sampleable, rng::AbstractRNG) =
+    _additive_noise!(x_perturbed, x_batch, d, rng)
+
+
+
