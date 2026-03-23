@@ -67,7 +67,9 @@ function local_lipschitz_estimate(
     x_perturbed = similar(x)
     X_perturbed_flat = similar(X_orig_flat)
 
+    @debug "LocalLipschitzEstimate start" nr_samples=metric.nr_samples batch_size=batch_size
     for i in 1:metric.nr_samples
+        iter_t0 = time()
         perturb_input!(x_perturbed, x, metric.perturb_config)
 
         expl_perturbed = analyze(x_perturbed, method, IndexSelector(y))
@@ -95,12 +97,16 @@ function local_lipschitz_estimate(
         # Mask changed predictions with NaN
         sim_scores[changed_idx] .= T(NaN)
         similarities[:, i] = sim_scores
+
+        @debug "LocalLipschitzEstimate progress" iter=i nr_samples=metric.nr_samples
     end
 
     # Replace remaining NaNs with -Inf if not returning NaNs
     if !metric.return_nan_when_prediction_changes
         similarities[isnan.(similarities)] .= T(-Inf)
     end
+
+    @debug "LocalLipschitzEstimate done"
 
     scores = dropdims(maximum(similarities, dims = 2), dims = 2)
     return scores

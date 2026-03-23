@@ -7,10 +7,6 @@ using Statistics: mean
 using Lux
 using ExplainableAI
 
-# This is more of a sanity test, functions used in the metric are tested separately
-ENV["XAIMETRICS_DEBUG"] = "false"
-ENV["XAIMETRICS_DEBUG_EVERY"] = "1"
-
 rng = Xoshiro(42)
 model = Lux.Dense(784 => 10)
 ps, st = Lux.setup(rng, model)

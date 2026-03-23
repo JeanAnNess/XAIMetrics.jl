@@ -65,12 +65,14 @@ function avg_sensitivity_estimate(
 
     x_perturbed = similar(x)
 
+    @debug "AvgSensitivity start" nr_samples=metric.nr_samples batch_size=batch_size
     for i in 1:metric.nr_samples
+        iter_t0 = time()
         perturb_input!(x_perturbed, x, metric.perturb_config)
 
         expl_perturbed = analyze(x_perturbed, method, IndexSelector(y))
         a_perturbed = expl_perturbed.val
-        a_perturbed_processed = normalize_explanations(a_perturbed, metric.normalize_config)
+        a_perturbed_processed = normalize_explanations(a_perturbed, metric.normalize_config) # ideally should be inplace, does that exist?
 
         # Predictions for perturbed batch
         changed_idx = falses(batch_size)
@@ -92,6 +94,8 @@ function avg_sensitivity_estimate(
         # Mask changed predictions with NaN
         sim_scores[changed_idx] .= T(NaN)
         similarities[:, i] = sim_scores
+
+        @debug "AvgSensitivity progress" iter=i nr_samples=metric.nr_samples
     end
 
     if metric.return_nan_when_prediction_changes
@@ -99,5 +103,8 @@ function avg_sensitivity_estimate(
     else
         scores = [mean(filter(!isnan, row)) for row in eachrow(similarities)]
     end
+
+    @debug "AvgSensitivity done"
+
     return scores
 end
