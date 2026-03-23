@@ -1,11 +1,12 @@
 [deps]
+ADTypes = "47edcb42-4c32-4615-8424-f2b9edc5f35b"
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
 ExplainableAI = "4f1bc3e1-d60d-4ed0-9367-9bdff9846d3b"
-Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
 JET = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
 JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-Metalhead = "dbeba491-748d-5e0e-a39e-b530a07fa0cc"
+Lux = "b2108857-7c20-44ae-9111-449ecde12c47"
 NPZ = "15e1cf62-19b3-5cfa-8e77-841668bca605"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
@@ -15,6 +16,3 @@ XAIMetrics = "e7195dda-7263-482e-a02a-16fc3aed5685"
 
 [sources]
 XAIMetrics = {path = ".."}
-
-[compat]
-Flux = "0.14"

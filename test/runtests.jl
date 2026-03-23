@@ -6,7 +6,7 @@ using XAIMetrics
     include("test_similarity_func.jl")
     include("test_normalize.jl")
     # Metrics
-	include("test_lle.jl")
-    include("test_avg_sens.jl")
-    include("robustness_parity.jl")
+	include("metrics/test_lle.jl")
+    include("metrics/test_avg_sens.jl")
+    # include("metrics/robustness_parity.jl")  need to rewrite using Lux
 end

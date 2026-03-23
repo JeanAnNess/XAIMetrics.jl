@@ -2,7 +2,7 @@ using Test
 using XAIMetrics
 
 using Random
-using Flux
+# using Flux  # Need to rewrite in Lux
 using ExplainableAI
 using Statistics
 using Metalhead
@@ -16,7 +16,7 @@ const SANITY_DATA_FILE = joinpath(ASSETS_DIR, "robustness.jld2")
 println("Assets directory: $ASSETS_DIR")
 
 @testset "Quantus Parity Checks" begin
-    Random.seed!(123)
+    rng = Xoshiro(123)
     data = load(SANITY_DATA_FILE)
     x_batch = data["x_batch"]       # (W, H, C, N) Float32
     y_batch = data["y_batch"]       # Vector{Int} 
@@ -44,7 +44,7 @@ println("Assets directory: $ASSETS_DIR")
 
     @testset "Metric: Average Sensitivity" begin
         @info "Evaluating AvgSensitivity..."
-        perturb_cfg = PerturbationConfig(uniform_noise!, (; lower = 0.2))
+        perturb_cfg = PerturbationConfig(uniform_noise!, (; lower = 0.2), rng = rng)
         metric = AvgSensitivity(
             nr_samples=10,
             perturb_config=perturb_cfg
@@ -57,7 +57,7 @@ println("Assets directory: $ASSETS_DIR")
 
     @testset "Metric: Local Lipschitz Estimate" begin
         @info "Evaluating LocalLipschitzEstimate..."
-        perturb_cfg = PerturbationConfig(gaussian_perturbation!, (; std = 0.2))
+        perturb_cfg = PerturbationConfig(gaussian_perturbation!, (; std = 0.2), rng = rng)
         metric = LocalLipschitzEstimate(
             nr_samples=10,
             perturb_config=perturb_cfg

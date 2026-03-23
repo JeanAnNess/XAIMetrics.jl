@@ -2,30 +2,28 @@ using Test
 using XAIMetrics
 
 using Random
-using Statistics: mean
-using Flux
+# using Statistics: mean
+
+using Lux
 using ExplainableAI
 
 # This is more of a sanity test, functions used in the metric are tested separately
 ENV["XAIMETRICS_DEBUG"] = "false"
 ENV["XAIMETRICS_DEBUG_EVERY"] = "1"
-# model and analyzer
-flux_model = Chain(
-    Conv((3, 3), 1 => 4, relu; pad = (1, 1)),
-    Flux.flatten,
-    Dense(4 * 28 * 28, 10)
-)
 
-analyzer = InputTimesGradient(flux_model)
+rng = Xoshiro(42)
+model = Lux.Dense(784 => 10)
+ps, st = Lux.setup(rng, model)
+forward = x -> first(model(reshape(x, 784, :), ps, st))
+analyzer = InputTimesGradient(forward, AutoForwardDiff())
 
 @testset "Local Lipschitz Estimate Integration" begin
-    Random.seed!(123)
-    batch_size = 4
-    x_batch = rand(Float32, 28, 28, 1, batch_size)
+    rng = Xoshiro(123)
+    x_batch = rand(rng, Float32, 28, 28, 1, 4)
     y_batch = [2, 5, 1, 9]
 
-    perturb_cfg_low_std = PerturbationConfig(gaussian_perturbation!, (; std = 0.1))
-    perturb_cfg_high_std = PerturbationConfig(gaussian_perturbation!, (; std = 0.8))
+    perturb_cfg_low_std = PerturbationConfig(gaussian_perturbation!, (; std = 0.1), rng = rng)
+    perturb_cfg_high_std = PerturbationConfig(gaussian_perturbation!, (; std = 0.8), rng = rng)
 
     @testset "Basic Execution with Analyzer" begin
         metric_low_std = LocalLipschitzEstimate(
