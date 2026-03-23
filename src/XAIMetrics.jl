@@ -2,11 +2,11 @@ module XAIMetrics # Rename XAIMetrics
 
 using XAIBase: AbstractXAIMethod, IndexSelector, analyze
 using Base: @kwdef
-using LinearAlgebra
+using LinearAlgebra: norm
 using Distributions: Sampleable, Normal, Uniform
 
-using Random
-using Statistics
+using Random: AbstractRNG, rand!, default_rng
+using Statistics: mean
 
 # abstracts
 include("abstracts.jl")
@@ -42,6 +42,9 @@ const higherisbetter = HigherIsBetter()
 
 """ 
     evaluate(metric, method, x; y, s)
+
+XAIMetrics is backend-agnostic. Any `AbstractXAIMethod` from XAIBase.jl works,
+regardless of whether it uses Zygote, Enzyme, or ForwardDiff internally.
 """
 function evaluate(
         metric::AbstractXAIMetric,
