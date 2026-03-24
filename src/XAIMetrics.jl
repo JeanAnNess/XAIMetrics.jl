@@ -29,7 +29,7 @@ include("configurations/similarity_config.jl")
 include("metrics/robustness/locallipschitz.jl")
 include("metrics/robustness/avg_sensitivity.jl")
 
-const DEFAULT_NORM_FUNC = (x, y) -> norm(x - y)
+const DEFAULT_NORM_FUNC = (a, b) -> sqrt.(sum(abs2.(a .- b); dims=1))
 const DEFAULT_SENS_NORM_FUNC = columnwise_l2_norm
 
 abstract type ScoreDirection end

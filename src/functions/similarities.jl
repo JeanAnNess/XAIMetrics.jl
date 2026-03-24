@@ -3,7 +3,11 @@
 
 Calculate Euclidean distance between two arrays (e.g., images or explanations).
 """
-function distance_euclidean(a::AbstractArray, b::AbstractArray)
+function distance_euclidean(a::AbstractMatrix, b::AbstractMatrix)
+    return sqrt.(sum(abs2.(a .- b); dims=1))
+end
+
+function distance_euclidean(a::AbstractVector, b::AbstractVector)
     return norm(a - b)
 end
 
@@ -12,8 +16,12 @@ end
 
 Calculate Manhattan (L1) distance between two arrays.
 """
-function distance_manhattan(a::AbstractArray, b::AbstractArray)
-    return sum(abs.(a .- b))
+function distance_manhattan(a::AbstractMatrix, b::AbstractMatrix)
+    return sum(abs.(a .- b); dims=1)
+end
+
+function distance_manhattan(a::AbstractVector, b::AbstractVector)
+    return sum(abs, a - b)
 end
 
 """
@@ -30,22 +38,7 @@ function lipschitz_constant(
         norm_denominator = distance_euclidean
     )
     epsilon = eps(eltype(a))
-
-    num_samples = size(a, 2)
-    scores = zeros(eltype(a), num_samples)
-
-    for i in 1:num_samples
-        a_col = @view a[:, i]
-        b_col = @view b[:, i]
-        c_col = @view c[:, i]
-        d_col = @view d[:, i]
-
-        numerator = norm_numerator(a_col, b_col)
-        denominator = norm_denominator(c_col, d_col)
-        scores[i] = numerator / (denominator + epsilon)
-    end
-
-    return scores
+    return vec(norm_numerator(a, b) ./ (norm_denominator(c, d) .+ epsilon))
 end
 
 """
@@ -68,13 +61,11 @@ function sensitivity_ratio(
         norm_numerator, norm_denominator,
         kwargs...
     ) where {T}
-    sensitivities = A_orig - A_perturbed
 
-    numerator = norm_numerator(sensitivities)
+    numerator   = norm_numerator(A_orig .- A_perturbed)
     denominator = norm_denominator(A_orig)
-
-    ratio = numerator ./ denominator
-    ratio[denominator .== 0] .= T(NaN)
+    
+    ratio = ifelse.(denominator .== 0, T(NaN), numerator ./ denominator)
 
     return vec(ratio)
 end

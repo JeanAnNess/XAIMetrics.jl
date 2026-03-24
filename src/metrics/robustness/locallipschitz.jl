@@ -62,41 +62,38 @@ function local_lipschitz_estimate(
     X_orig_flat = reshape(x, num_features, batch_size)
     A_orig_flat = reshape(a_processed, num_features, batch_size)
 
-    similarities = Matrix{T}(undef, batch_size, metric.nr_samples)
+    similarities = similar(x, batch_size, metric.nr_samples)
 
-    x_perturbed = similar(x)
-    X_perturbed_flat = similar(X_orig_flat)
-
+    # preallocate
+    x_perturbed        = similar(x)
+    A_perturbed_flat   = similar(A_orig_flat)
+    X_perturbed_flat   = similar(X_orig_flat)
+    changed_idx        = falses(batch_size)
+    
     @debug "LocalLipschitzEstimate start" nr_samples=metric.nr_samples batch_size=batch_size
     for i in 1:metric.nr_samples
-        iter_t0 = time()
         perturb_input!(x_perturbed, x, metric.perturb_config)
 
         expl_perturbed = analyze(x_perturbed, method, IndexSelector(y))
-        a_perturbed = expl_perturbed.val
-        a_perturbed_processed = normalize_explanations(a_perturbed, metric.normalize_config)
+        a_perturbed_processed = normalize_explanations(expl_perturbed.val, metric.normalize_config)
 
-        # Predictions for perturbed batch
-        changed_idx = falses(batch_size)
+        A_perturbed_flat .= reshape(a_perturbed_processed, num_features, batch_size)
+        X_perturbed_flat .= reshape(x_perturbed, num_features, batch_size)
+
         if metric.return_nan_when_prediction_changes
-            y_pred_classes = predicted_classes(y_pred)
-            y_pred_perturbed = predicted_classes(expl_perturbed.output)
-            changed_idx .= y_pred_classes .!= y_pred_perturbed
+            fill!(changed_idx, false)
+            changed_idx .= predicted_classes(expl_perturbed.output) .!= predicted_classes(y_pred)
         end
-
-        A_perturbed_flat = reshape(a_perturbed_processed, num_features, batch_size)
-        X_perturbed_flat = reshape(x_perturbed, num_features, batch_size)
 
         sim_scores = metric.similarity_func(
             A_orig_flat, A_perturbed_flat,
             X_orig_flat, X_perturbed_flat;
-            norm_numerator = metric.norm_numerator,
-            norm_denominator = metric.norm_denominator
+            norm_numerator   = metric.norm_numerator,
+            norm_denominator = metric.norm_denominator,
         )
 
-        # Mask changed predictions with NaN
         sim_scores[changed_idx] .= T(NaN)
-        similarities[:, i] = sim_scores
+        similarities[:, i] .= sim_scores
 
         @debug "LocalLipschitzEstimate progress" iter=i nr_samples=metric.nr_samples
     end
