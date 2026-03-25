@@ -1,5 +1,5 @@
 """
-    LocalLipschitzEstimate(; nr_samples=200, similarity_func, norm_numerator, norm_denominator, perturb_std=0.1, return_nan_when_prediction_changes=false)
+    LocalLipschitzEstimate(; nr_samples=200, similarity_func, norm_numerator, norm_denominator, perturb_std=0.1, return_missing_when_prediction_changes=false)
     <: AbstractRobustnessMetric
 
 Robustness metric that tests the consistency in the explanation for neighboring examples
@@ -10,7 +10,7 @@ by estimating the local Lipschitz constant.
     similarity_func::FS = lipschitz_constant
     norm_numerator::FN = DEFAULT_NORM_FUNC
     norm_denominator::FD = DEFAULT_NORM_FUNC
-    return_nan_when_prediction_changes::Bool = false
+    return_missing_when_prediction_changes::Bool = false
     perturb_config::PerturbationConfig = PerturbationConfig(gaussian_perturbation!, (; std = 0.2))
     normalize_config::NormalizationConfig = NormalizationConfig()
 end
@@ -50,25 +50,23 @@ function local_lipschitz_estimate(
         y_pred::AbstractMatrix{<:Real},
         a::AbstractArray{T, N}
     ) where {T, N}
-    # model = method.model
+    
     _size = size(x)
     batch_size = _size[end]
     num_features = prod(_size[1:(end - 1)])
 
-    # Compute initial explanations
     a_processed = normalize_explanations(a, metric.normalize_config)
 
-    # Flatten for similarity computation (features × batch)
     X_orig_flat = reshape(x, num_features, batch_size)
     A_orig_flat = reshape(a_processed, num_features, batch_size)
 
+    # preallocate
     similarities = similar(x, batch_size, metric.nr_samples)
 
-    # preallocate
     x_perturbed        = similar(x)
     A_perturbed_flat   = similar(A_orig_flat)
     X_perturbed_flat   = similar(X_orig_flat)
-    changed_idx        = falses(batch_size)
+    changed_idx        = similar(x, Bool, batch_size)
     
     @debug "LocalLipschitzEstimate start" nr_samples=metric.nr_samples batch_size=batch_size
     for i in 1:metric.nr_samples
@@ -80,9 +78,10 @@ function local_lipschitz_estimate(
         A_perturbed_flat .= reshape(a_perturbed_processed, num_features, batch_size)
         X_perturbed_flat .= reshape(x_perturbed, num_features, batch_size)
 
-        if metric.return_nan_when_prediction_changes
-            fill!(changed_idx, false)
+        if metric.return_missing_when_prediction_changes
             changed_idx .= predicted_classes(expl_perturbed.output) .!= predicted_classes(y_pred)
+        else
+            fill!(changed_idx, false)
         end
 
         sim_scores = metric.similarity_func(
@@ -92,19 +91,22 @@ function local_lipschitz_estimate(
             norm_denominator = metric.norm_denominator,
         )
 
-        sim_scores[changed_idx] .= T(NaN)
-        similarities[:, i] .= sim_scores
-
-        @debug "LocalLipschitzEstimate progress" iter=i nr_samples=metric.nr_samples
+        # NaN placeholder
+        if metric.return_missing_when_prediction_changes
+            similarities[:, i] .= ifelse.(changed_idx, T(NaN), sim_scores)
+        else
+            similarities[:, i] .= ifelse.(isnan.(sim_scores), T(-Inf), sim_scores)
+        end
     end
-
-    # Replace remaining NaNs with -Inf if not returning NaNs
-    if !metric.return_nan_when_prediction_changes
-        similarities[isnan.(similarities)] .= T(-Inf)
-    end
-
-    @debug "LocalLipschitzEstimate done"
-
+    
     scores = dropdims(maximum(similarities, dims = 2), dims = 2)
+    
+    # Nan -> missing
+    if metric.return_missing_when_prediction_changes
+        scores_missing = similar(scores, Union{T, Missing})
+        scores_missing .= ifelse.(isnan.(scores), missing, scores)
+        return scores_missing
+    end
+    
     return scores
 end

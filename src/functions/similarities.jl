@@ -8,7 +8,7 @@ function distance_euclidean(a::AbstractMatrix, b::AbstractMatrix)
 end
 
 function distance_euclidean(a::AbstractVector, b::AbstractVector)
-    return norm(a - b)
+    return sqrt(sum(abs2, a .- b)) 
 end
 
 """
@@ -21,7 +21,7 @@ function distance_manhattan(a::AbstractMatrix, b::AbstractMatrix)
 end
 
 function distance_manhattan(a::AbstractVector, b::AbstractVector)
-    return sum(abs, a - b)
+    return sum(abs, a .- b)
 end
 
 """
@@ -37,7 +37,7 @@ function lipschitz_constant(
         norm_numerator = distance_manhattan,
         norm_denominator = distance_euclidean
     )
-    epsilon = eps(eltype(a))
+    epsilon = eps(eltype(a)) 
     return vec(norm_numerator(a, b) ./ (norm_denominator(c, d) .+ epsilon))
 end
 
@@ -47,7 +47,7 @@ end
 Calculate the difference between two images or explanations.
 """
 function difference(a::AbstractMatrix, b::AbstractMatrix)
-    return a - b
+    return a .- b
 end
 
 """
@@ -65,7 +65,7 @@ function sensitivity_ratio(
     numerator   = norm_numerator(A_orig .- A_perturbed)
     denominator = norm_denominator(A_orig)
     
-    ratio = ifelse.(denominator .== 0, T(NaN), numerator ./ denominator)
+    ratio = ifelse.(denominator .== zero(T), T(NaN), numerator ./ denominator)
 
     return vec(ratio)
 end

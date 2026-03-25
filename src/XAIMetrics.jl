@@ -78,6 +78,9 @@ export AbstractRandomisationMetric, AbstractFaithfulnessMetric, AbstractRobustne
 # Configurations
 export NormalizationConfig, PerturbationConfig, SimilarityConfig
 
+# 
+export normalize_explanations
+
 # Metrics
 
 ## Axoimatic
@@ -96,8 +99,14 @@ export LocalLipschitzEstimate, AvgSensitivity
 
 # Functions
 
+# functions
+export predicted_classes
+
 ## normalization
 export normalize_by_max_abs, stable_division
+
+## norm functions
+export frobenius_norm, columnwise_l2_norm
 
 ## perturbation
 export gaussian_perturbation!, uniform_noise!, perturb_input!
