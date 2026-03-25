@@ -41,8 +41,8 @@ analyzer = InputTimesGradient(forward, AutoForwardDiff())
 
         @test scores_low isa Vector{Float32}
         @test scores_high isa Vector{Float32}
-        @test !any(isnan, scores_low)   # default behavior should not return NaN
-        @test !any(isnan, scores_high)
+        @test !any(ismissing, scores_low)   # default behavior should not return missing
+        @test !any(ismissing, scores_high)
         @test mean(scores_high) > mean(scores_low) # Higher noise should increase sensitivity
     end
 
@@ -50,13 +50,13 @@ analyzer = InputTimesGradient(forward, AutoForwardDiff())
         metric_low_noise_with_check = AvgSensitivity(
             nr_samples = 50,
             perturb_config = perturb_cfg_low_noise,
-            return_nan_when_prediction_changes = true
+            return_missing_when_prediction_changes = true
         )
 
         metric_high_noise_with_check = AvgSensitivity(
             nr_samples = 50,
             perturb_config = perturb_cfg_high_noise,
-            return_nan_when_prediction_changes = true
+            return_missing_when_prediction_changes = true
         )
 
         scores_low = evaluate(
@@ -69,7 +69,7 @@ analyzer = InputTimesGradient(forward, AutoForwardDiff())
         println("Scores with low noise (with check): ", scores_low)
         println("Scores with high noise (with check): ", scores_high)
 
-        @test any(isnan, scores_high)
-        @test count(isnan, scores_high) >= count(isnan, scores_low)
+        @test any(ismissing, scores_high)
+        @test count(ismissing, scores_high) >= count(ismissing, scores_low)
     end
 end

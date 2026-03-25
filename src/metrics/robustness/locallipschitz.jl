@@ -62,7 +62,6 @@ function local_lipschitz_estimate(
 
     # preallocate
     similarities = similar(x, batch_size, metric.nr_samples)
-
     x_perturbed        = similar(x)
     A_perturbed_flat   = similar(A_orig_flat)
     X_perturbed_flat   = similar(X_orig_flat)
@@ -98,7 +97,7 @@ function local_lipschitz_estimate(
             similarities[:, i] .= ifelse.(isnan.(sim_scores), T(-Inf), sim_scores)
         end
     end
-    
+
     scores = dropdims(maximum(similarities, dims = 2), dims = 2)
     
     # Nan -> missing
