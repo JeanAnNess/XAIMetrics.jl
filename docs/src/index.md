@@ -17,6 +17,7 @@ julia> ]add  XAIMetrics # not yet as the package is not registered
 
 - Metric entry point: `evaluate`
 - Robustness metrics: `LocalLipschitzEstimate`, `AvgSensitivity`
+- Localisation metrics: `RelevanceRankAccuracy`
 - Configurations: `NormalizationConfig`, `PerturbationConfig`
 - Utility functions: normalization, perturbation, and similarity helpers
 
@@ -45,7 +46,8 @@ Depth = 2
 
 ```@contents
 Pages = [
-    "metrics/robustness.md"
+    "metrics/robustness.md",
+    "metrics/localisation.md"
 ]
 Depth = 2
 ```

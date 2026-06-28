@@ -8,5 +8,6 @@ using XAIMetrics
     # Metrics
 	include("metrics/test_lle.jl")
     include("metrics/test_avg_sens.jl")
+    include("metrics/test_relevance_rank_accuracy.jl")
     # include("metrics/robustness_parity.jl")  need to rewrite using Lux
 end

@@ -56,7 +56,7 @@ lle_metric = LocalLipschitzEstimate(
         gaussian_perturbation!,
         (; std = 0.2),
     ),
-    return_nan_when_prediction_changes = false,
+    return_missing_when_prediction_changes = false,
 )
 
 lle_scores = evaluate(lle_metric, method, x; y = y)
@@ -104,9 +104,9 @@ println("maximum(abs, a_demo)    = ", maximum(abs, a_demo))
 println("maximum(abs, a_norm)    = ", maximum(abs, a_norm))
 
 # ## Handling prediction changes
-# Both robustness metrics support `return_nan_when_prediction_changes`:
+# Both robustness metrics support `return_missing_when_prediction_changes`:
 #
-# - `true`: keep changed-prediction cases as `NaN`
+# - `true`: return `missing` for samples where the prediction changed
 # - `false`: aggregate over available finite scores
 #
 # This is useful when you want to separate explanation instability from class-change effects.

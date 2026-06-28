@@ -29,6 +29,9 @@ include("configurations/similarity_config.jl")
 include("metrics/robustness/locallipschitz.jl")
 include("metrics/robustness/avg_sensitivity.jl")
 
+# Localisation Metrics
+include("metrics/localisation/relevance_rank_accuracy.jl")
+
 const DEFAULT_NORM_FUNC = (a, b) -> sqrt.(sum(abs2.(a .- b); dims=1))
 const DEFAULT_SENS_NORM_FUNC = columnwise_l2_norm
 
@@ -38,6 +41,10 @@ struct HigherIsBetter <: ScoreDirection end
 
 const lowerisbetter = LowerIsBetter()
 const higherisbetter = HigherIsBetter()
+
+function scoredirection(metric::AbstractXAIMetric)
+    error("scoredirection not implemented for $(typeof(metric))")
+end
 
 
 """ 
@@ -68,7 +75,7 @@ function evaluate(
 end
 
 
-export evaluate
+export evaluate, scoredirection, lowerisbetter, higherisbetter
 
 # Abstracts
 export AbstractXAIMetric
@@ -88,6 +95,7 @@ export normalize_explanations
 ## Complexity
 
 ## Localisation
+export RelevanceRankAccuracy
 
 ## Randomisation
 
